@@ -3,11 +3,9 @@
 
 #include "../types.hpp"
 #include <vector>
+#include <iostream>
 
 namespace simploce {
-
-  class Triangle;
-  class Edge;
 
   /**
    * A surface consisting of vertices (surface points). It may also include edges and 
@@ -24,7 +22,11 @@ namespace simploce {
     
     ~Surface();
 
-    void triangulate();
+    /**
+     * Triangulate this surface.
+     * @param triangulator - Triangulation algorithm.
+     */
+    void triangulate(const Triangulator& triangulator);
 
     bool isTriangulated();
 
@@ -33,13 +35,43 @@ namespace simploce {
      */
     void validate();
 
+    /**
+     * Returns total surface area.
+     */
+    area_t area() const;
+
+    /**
+     * Returns triangles.
+     */
+    const std::vector<Triangle>& triangles() const;
+
+    /**
+     * Returns edges.
+     */
+    const std::vector<Edge>& edges() const;
+
+    /**
+     * Writes this surface to an output stream.
+     * @param stream Output stream.
+     * @return Output stream.
+     */
+    std::ostream& writeTo(std::ostream& stream) const;
+
   private:
 
     std::vector<vertex_ptr_t> vertices_;
     std::vector<Triangle> triangles_;
     std::vector<Edge> edges_;
-    
+    bool triangulated_;
   };
+
+  /**
+   * Writes surface to an output stream.
+   * @param stream - Output stream.
+   * @param surface - Surface.
+   * @return Output stream.
+   */
+  std::ostream& operator << (std::ostream& stream, const Surface& surface);
 }
 
 #endif

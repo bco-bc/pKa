@@ -324,6 +324,21 @@ namespace simploce {
     T cos_angle = ip / (norm1 * norm2);
     return std::acos(cos_angle);
   }
+
+  /**
+   * Returns cross product between two Cartesion vectors.
+   * @param a Vector of type defined by V and D. Should have a non-zero norm.
+   * @param b Vector of type defined by V and D. Should have a non-zero norm.
+   * @return Cartesian vector v of type defined by V and D, v = a x b.
+   */
+  template <typename V, int D>
+  cvector<V,D>cross(const cvector<V,D>& a, const cvector<V,D>& b)
+  {
+    V v0 = a[1] * b[2] -a[2] * b[1];
+    V v1 = a[2] * b[0] -a[0] * b[2];
+    V v2 = a[0] * b[1] -a[1] * b[0];
+    return cvector<V,D>{v0,v1,v2};
+  }
   
   /**
    * Writes each vector component to output stream, with precision 5 and width 13. Note that 

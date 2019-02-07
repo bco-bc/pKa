@@ -43,7 +43,8 @@ namespace simploce {
     static Id<T,V> next();
     
     /**
-     * Sets start value and increment for id.
+     * Sets start value and increment for id. Use this to override start value of 1
+     * and increment value of 1.
      * @param start Start value.
      * @param increment Increment value.
      */
@@ -75,10 +76,10 @@ namespace simploce {
   }
   
   template <typename T, typename V>
-  V Id<T,V>::ID{};
+  V Id<T,V>::ID{1};
   
   template <typename T, typename V>
-  V Id<T,V>::INCREMENT{};
+  V Id<T,V>::INCREMENT{1};
   
   /**
    * Smaller than operator.

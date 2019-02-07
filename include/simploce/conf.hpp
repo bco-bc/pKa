@@ -17,6 +17,11 @@ namespace simploce {
    * Field width for numbers written to an output stream.
    */
   const int WIDTH = 13;
+
+  /**
+   * A small number.
+   */
+  const double SMALL = 1.0e-07;
   
 }
 

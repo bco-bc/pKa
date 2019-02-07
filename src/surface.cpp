@@ -1,47 +1,15 @@
 #include "simploce/surface/surface.hpp"
+#include "simploce/surface/vertex.hpp"
 #include "simploce/surface/triangle.hpp"
 #include "simploce/surface/edge.hpp"
+#include "simploce/surface/triangulator.hpp"
 #include <stdexcept>
 #include <iostream>
 
 namespace simploce {
-
-  static std::pair<std::vector<Triangle>,std::vector<Edge>>
-    makeTetrahedron(const std::vector<vertex_ptr_t>& vertices)
-  {
-    std::vector<Triangle> triangles;
-    std::vector<Edge> edges;
-
-    // 6 edges.
-    Edge e1{vertices[0], vertices[1]};
-    Edge e2{vertices[0], vertices[2]};
-    Edge e3{vertices[0], vertices[3]};
-    Edge e4{vertices[1], vertices[2]};
-    Edge e5{vertices[1], vertices[3]};
-    Edge e6{vertices[2], vertices[3]};
-    edges.push_back(e1);
-    edges.push_back(e2);
-    edges.push_back(e3);
-    edges.push_back(e4);
-    edges.push_back(e5);
-    edges.push_back(e6);
-
-    // 4 triangles.
-    Triangle t1{vertices[0], vertices[1], vertices[2]};
-    Triangle t2{vertices[0], vertices[1], vertices[3]};
-    Triangle t3{vertices[0], vertices[2], vertices[3]};
-    Triangle t4{vertices[1], vertices[2], vertices[3]};
-    triangles.push_back(t1);
-    triangles.push_back(t2);
-    triangles.push_back(t3);
-    triangles.push_back(t4);
-    
-    
-    return std::make_pair(triangles, edges);
-  }
-
+ 
   Surface::Surface(const std::vector<vertex_t>& vertices) :
-    vertices_{}, triangles_{}, edges_{}
+    vertices_{}, triangles_{}, edges_{}, triangulated_{false}
   {
     for (auto v : vertices) {
       vertex_ptr_t vertex = std::make_shared<vertex_t>(v);
@@ -56,22 +24,26 @@ namespace simploce {
   {
   }
 
-  void Surface::triangulate()
+  void Surface::triangulate(const Triangulator& triangulator)
   {
     if ( vertices_.size() < 4) {
       throw std::domain_error("Triangulated surface: a minimum of 4 vertices are required.");
     }
-    if ( vertices_.size() == 4) {
-      auto pair = makeTetrahedron(vertices_);
-      triangles_ = pair.first;
-      edges_ = pair.second;
-    }
+    
+    // Triangulate.
+    auto pair = triangulator.generate(vertices_);
+    triangles_ = pair.first;
+    edges_ = pair.second;
+
+    // Check.
     this->validate();
+
+    triangulated_ = true;
   }
 
   bool Surface::isTriangulated()
   {
-    return false;
+    return triangulated_;
   }
 
   void Surface::validate()
@@ -82,6 +54,56 @@ namespace simploce {
 	throw std::domain_error("Triangulated surface: Euler characteristic != 2.");
       }
     }
+  }
+
+  area_t Surface::area() const
+  {
+    area_t area{0};
+    for (auto t : triangles_) {
+      area += t.area();
+    }
+    return area;
+  }
+
+  const std::vector<Edge>& Surface::edges() const
+  {
+    return edges_;
+  }
+
+  const std::vector<Triangle>& Surface::triangles() const
+  {
+    return triangles_;
+  }
+
+  std::ostream& Surface::writeTo(std::ostream& stream) const
+  {
+    stream.setf(std::ios::scientific);
+    stream.precision(PRECISION);
+    stream << vertices_.size() << std::endl;
+    for (auto v : vertices_) {
+      stream << *v << std::endl;
+    }
+    stream << triangles_.size();
+    if ( triangles_.size() > 0 ) {
+      stream << std::endl;
+      for (auto t : triangles_) {
+	stream << t << std::endl;
+      }
+      stream << edges_.size() << std::endl;
+      for (auto iter = edges_.begin(); iter != edges_.end() - 1; ++iter) {
+	const Edge& e = *iter;
+	stream << e << std::endl;
+      }
+      const Edge& e = *(edges_.end() - 1);
+      stream << e;
+    }
+
+    return stream;
+  }
+
+  std::ostream& operator << (std::ostream& stream, const Surface& surface)
+  {
+    return surface.writeTo(stream);
   }
 			 
 }

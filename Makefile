@@ -10,11 +10,12 @@ VPATH = ../include/simploce/surface \
 TEMPLATES = cvector.hpp id.hpp util.hpp
 
 INCLUDE = conf.hpp \
-          surface.hpp triangle.hpp edge.hpp vertex.hpp
+          surface.hpp triangle.hpp edge.hpp vertex.hpp triangulator.hpp \
+          tetrahedron-triangulator.hpp
 
-SRC = surface.cpp triangle.cpp edge.cpp vertex.cpp
+SRC = surface.cpp triangle.cpp edge.cpp vertex.cpp tetrahedron-triangulator.cpp
 
-TESTS =
+TESTS = test-vertex.cpp test-surface.cpp
 
 APPS =
 
@@ -41,6 +42,10 @@ LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostrea
 
 # All object files. Default.
 %.o : %.cpp $(INCLUDE)
+	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
+
+# Special cases
+triangle.o : triangle.cpp $(INCLUDE) $(TEMPLATES)
 	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
 
 # All executables.
