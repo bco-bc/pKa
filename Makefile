@@ -1,21 +1,23 @@
 PREFIX = /home/ajuffer
 
 VPATH = ../include/simploce/surface \
-        ../include/simploce/util \
+        ../include/simploce/protein \
         ../include/simploce \
         ../src \
         ../tests \
-        ../apps
-
-TEMPLATES = cvector.hpp id.hpp util.hpp
+        ../apps 
 
 INCLUDE = conf.hpp \
-          surface.hpp triangle.hpp edge.hpp vertex.hpp triangulator.hpp \
-          tetrahedron-triangulator.hpp
+          surface.hpp triangulated-surface.hpp triangle.hpp edge.hpp vertex.hpp triangulator.hpp \
+          tetrahedron-triangulator.hpp nsc.hpp dotted-surface-generator.hpp \
+          chem-reader.hpp pdb-reader.hpp input-source.hpp content-handler.hpp \
+          file-input-source.hpp logger-content-handler.hpp
 
-SRC = surface.cpp triangle.cpp edge.cpp vertex.cpp tetrahedron-triangulator.cpp
+SRC = surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
+      tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
+      pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp
 
-TESTS = test-vertex.cpp test-surface.cpp
+TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp
 
 APPS =
 
@@ -25,16 +27,17 @@ TOBJ = $(TESTS:.cpp=.o)
 TEXE = $(TESTS:.cpp=)
 AEXE = $(APPS:.cpp=)
 
+SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
+
 # For g++ >= 5.4
 CC = g++
 LT = libtool
 LNAME = pka
 OPT = -ggdb
 STD = c++14
-#INCLPATH = -I$(CPPUTIL)/include -I$(CONF)/include
-INCLPATH =
-#OLIBS = -lcpputil
-OLIBS = 
+INCLPATH = -I$(SIMUTIL)/include
+OLIBS = -lsim-util
+#OLIBS = 
 CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread
 LDFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -L. -L$(PREFIX)/lib -pthread
 LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz
@@ -44,12 +47,8 @@ LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostrea
 %.o : %.cpp $(INCLUDE)
 	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
 
-# Special cases
-triangle.o : triangle.cpp $(INCLUDE) $(TEMPLATES)
-	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
-
 # All executables.
-% : %.cpp $(INCLUDE) $(TEMPLATES)
+% : %.cpp $(INCLUDE)
 	$(LT) --mode=link $(CC) $(LDFLAGS) $(LIBS) $< -o $@ -rpath $(PREFIX)/bin
 
 lib : $(SOBJ)

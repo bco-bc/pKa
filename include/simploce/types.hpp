@@ -1,9 +1,10 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
-#include "util/cvector.hpp"
+#include "simploce/util/cvector.hpp"
 #include <utility>
 #include <memory>
+#include <tuple>
 
 namespace simploce {
 
@@ -13,7 +14,7 @@ namespace simploce {
   using real_t = double;
 
   /**
-   * Leangth type.
+   * Length type.
    */
   using length_t = real_t;
 
@@ -21,6 +22,21 @@ namespace simploce {
    * Area type.
    */
   using area_t = real_t;
+
+  /**
+   * Volume type.
+   */
+  using volume_t = real_t;
+
+  /**
+   * Radius type.
+   */
+  using radius_t = real_t;
+
+  /**
+   * Charge type.
+   */
+  using charge_t = real_t;
 
   /**
    * Position type.
@@ -41,6 +57,16 @@ namespace simploce {
    * Normal unit vector.
    */
   using normal_t = unitv_t;
+
+  /**
+   * Dotted surface.
+   */
+  class Surface;
+
+  /**
+   * Triangulated surface.
+   */
+  class TriangulatedSurface;
 
   /**
    * Triangle
@@ -72,9 +98,42 @@ namespace simploce {
   /**
    * Triangulator pointer type.
    */
-  using triangular_ptr_t = std::shared_ptr<triangulator_t>;
-  
+  using triangular_ptr_t = std::shared_ptr<triangulator_t>;  
 
+  /**
+   * Particle type.
+   */
+  using particle_t = std::tuple<position_t, radius_t, charge_t>;
+
+  /**
+   * Chemical content reader.
+   */
+  class ChemReader;
+
+  /**
+   * Chemical content reader pointer type.
+   */
+  using chem_reader_ptr_t = std::shared_ptr<ChemReader>;
+  
+  /**
+   * Molecular content handler.
+   */
+  class ContentHandler;
+
+  /**
+   * Molecular content handler pointer type.
+   */
+  using content_handler_ptr_t = std::shared_ptr<ContentHandler>;
+
+  /**
+   * Molecular input source.
+   */
+  class InputSource;
+
+  /**
+   * Molecular input source pointer type.
+   */
+  using input_source_ptr_t = std::shared_ptr<InputSource>;
 }
 
 #endif

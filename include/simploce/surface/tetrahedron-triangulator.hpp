@@ -5,10 +5,15 @@
 
 namespace simploce {
 
-  class TetrahedronTriangulator : public Triangulator {    
-  public:
+  /**
+   * Creates a simple tetrahedron.
+   */
+  struct TetrahedronTriangulator : public Triangulator {    
 
-    result_t generate(std::vector<vertex_ptr_t>& vertices) const;
+    /**
+     * @param points - Surface points. Its size must be exactly 4.
+     */
+    TriangulatedSurface generate(const std::vector<position_t>& points) const;
     
   };
 }

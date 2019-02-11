@@ -2,7 +2,7 @@
 #define VERTEX_HPP
 
 #include "../types.hpp"
-#include "../util/id.hpp"
+#include "simploce/util/id.hpp"
 #include <iostream>
 
 namespace simploce {

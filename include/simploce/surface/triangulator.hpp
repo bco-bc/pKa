@@ -2,7 +2,6 @@
 #define TRIANGULATOR_HPP
 
 #include "../types.hpp"
-#include <utility>
 
 namespace simploce {
 
@@ -14,16 +13,11 @@ namespace simploce {
     virtual ~Triangulator() {}
 
     /**
-     * Return type of triangulator.
+     * Creates a triangulated surface from surface points.
+     * @param points - Surface points.
+     * @return Triangulated surface.
      */
-    using result_t = std::pair<std::vector<Triangle>, std::vector<Edge>>;
-
-    /**
-     * Creates a triangulated surface from vertices.
-     * @param vertices - Vertices. Should be enclosing some object.
-     * @return Triangles and edges.
-     */
-    virtual result_t generate(std::vector<vertex_ptr_t>& vertices) const = 0;
+    virtual TriangulatedSurface generate(const std::vector<position_t>& points) const = 0;
   };
 }
 

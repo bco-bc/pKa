@@ -8,47 +8,43 @@
 namespace simploce {
 
   /**
-   * A surface consisting of vertices (surface points). It may also include edges and 
-   * triangles, in which case the surface represents a triangulated surface.
+   * A surface represented by a collection of surface points (a dotted surface).
    */
   class Surface {
   public:
 
     /**
      * Constructor.
-     * @param vertices - Vertices. An internal copy is created.
+     * @param points - Surface points.
      */
-    Surface(const std::vector<vertex_t>& vertices);
-    
-    ~Surface();
+    Surface(const std::vector<position_t>& points);
+
+    /**
+     * Constructor.
+     * @param points - Surface points (dotted surface representation).
+     * @param area - Area of surface.
+     * @param volume - Volume of surface.
+     */
+    Surface(std::vector<position_t>& points, const area_t& area, const volume_t& volume);
 
     /**
      * Triangulate this surface.
-     * @param triangulator - Triangulation algorithm.
+     * @param triangulator - Triangulation algorithme.
+     * @return Triangulated surface.
      */
-    void triangulate(const Triangulator& triangulator);
-
-    bool isTriangulated();
+    TriangulatedSurface triangulate(const Triangulator& triangulator);
 
     /**
-     * Validate the surface, if possible.
-     */
-    void validate();
-
-    /**
-     * Returns total surface area.
+     * Returns surface area.
+     * @return Total area, or 0 if not provided.
      */
     area_t area() const;
 
     /**
-     * Returns triangles.
+     * Returns volume enclosed by surface.
+     * @return volume, or 0 if not provided.
      */
-    const std::vector<Triangle>& triangles() const;
-
-    /**
-     * Returns edges.
-     */
-    const std::vector<Edge>& edges() const;
+    volume_t volume() const;
 
     /**
      * Writes this surface to an output stream.
@@ -59,10 +55,10 @@ namespace simploce {
 
   private:
 
-    std::vector<vertex_ptr_t> vertices_;
-    std::vector<Triangle> triangles_;
-    std::vector<Edge> edges_;
-    bool triangulated_;
+    std::vector<position_t> points_;
+    area_t area_;
+    volume_t volume_;
+
   };
 
   /**

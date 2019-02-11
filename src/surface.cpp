@@ -3,101 +3,55 @@
 #include "simploce/surface/triangle.hpp"
 #include "simploce/surface/edge.hpp"
 #include "simploce/surface/triangulator.hpp"
+#include "simploce/surface/triangulated-surface.hpp"
+#include "simploce/conf.hpp"
 #include <stdexcept>
 #include <iostream>
 
 namespace simploce {
  
-  Surface::Surface(const std::vector<vertex_t>& vertices) :
-    vertices_{}, triangles_{}, edges_{}, triangulated_{false}
+  Surface::Surface(const std::vector<position_t>& points) :
+    points_{points}, area_{0}, volume_{0}
   {
-    for (auto v : vertices) {
-      vertex_ptr_t vertex = std::make_shared<vertex_t>(v);
-      vertices_.push_back(vertex);
-    }
-    if ( vertices_.empty() ) {
-      throw std::domain_error("Surface: vertices must be provided.");
+    if ( points_.empty() ) {
+      throw std::domain_error("Surface: surface points must be provided.");
     }
   }
 
-  Surface::~Surface()
+  Surface::Surface(std::vector<position_t>& points, const area_t& area, const volume_t& volume) :
+     points_{points}, area_{area}, volume_{volume}
   {
+    if ( points_.empty() ) {
+      throw std::domain_error("Surface: surface points must be provided.");
+    }    
   }
 
-  void Surface::triangulate(const Triangulator& triangulator)
+  TriangulatedSurface Surface::triangulate(const Triangulator& triangulator)
   {
-    if ( vertices_.size() < 4) {
-      throw std::domain_error("Triangulated surface: a minimum of 4 vertices are required.");
-    }
-    
-    // Triangulate.
-    auto pair = triangulator.generate(vertices_);
-    triangles_ = pair.first;
-    edges_ = pair.second;
-
-    // Check.
-    this->validate();
-
-    triangulated_ = true;
-  }
-
-  bool Surface::isTriangulated()
-  {
-    return triangulated_;
-  }
-
-  void Surface::validate()
-  {
-    if ( this->isTriangulated() ) {
-      std::size_t ec = vertices_.size() + triangles_.size() - edges_.size();
-      if ( ec != 2 ) {
-	throw std::domain_error("Triangulated surface: Euler characteristic != 2.");
-      }
-    }
+    return triangulator.generate(points_);
   }
 
   area_t Surface::area() const
   {
-    area_t area{0};
-    for (auto t : triangles_) {
-      area += t.area();
-    }
-    return area;
+    return area_;
   }
 
-  const std::vector<Edge>& Surface::edges() const
+  volume_t Surface::volume() const
   {
-    return edges_;
-  }
-
-  const std::vector<Triangle>& Surface::triangles() const
-  {
-    return triangles_;
+    return volume_;
   }
 
   std::ostream& Surface::writeTo(std::ostream& stream) const
   {
     stream.setf(std::ios::scientific);
     stream.precision(PRECISION);
-    stream << vertices_.size() << std::endl;
-    for (auto v : vertices_) {
-      stream << *v << std::endl;
+    
+    stream << points_.size() << std::endl;
+    for (auto p : points_) {
+      stream << p << std::endl;
     }
-    stream << triangles_.size();
-    if ( triangles_.size() > 0 ) {
-      stream << std::endl;
-      for (auto t : triangles_) {
-	stream << t << std::endl;
-      }
-      stream << edges_.size() << std::endl;
-      for (auto iter = edges_.begin(); iter != edges_.end() - 1; ++iter) {
-	const Edge& e = *iter;
-	stream << e << std::endl;
-      }
-      const Edge& e = *(edges_.end() - 1);
-      stream << e;
-    }
-
+    stream << area_ << SPACE << volume_;
+    
     return stream;
   }
 

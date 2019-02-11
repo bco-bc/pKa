@@ -1,21 +1,26 @@
 #include "simploce/surface/tetrahedron-triangulator.hpp"
+#include "simploce/surface/triangulated-surface.hpp"
 #include "simploce/surface/triangle.hpp"
 #include "simploce/surface/edge.hpp"
+#include "simploce/surface/vertex.hpp"
 
 namespace simploce {
 
-  using result_t = Triangulator::result_t;
-
-  result_t TetrahedronTriangulator::generate(std::vector<vertex_ptr_t>& vertices) const
+  TriangulatedSurface
+  TetrahedronTriangulator::generate(const std::vector<position_t>& points) const
   {
-    if ( vertices.size() != 4) {
-      throw std::domain_error("Tetrahedron: Can only be applied to 4 vertices.");
+    if ( points.size() != 4) {
+      throw std::domain_error("Tetrahedron: Can only be applied to 4 surface points.");
     }
-    
-    std::vector<Triangle> triangles;
-    std::vector<Edge> edges;
+
+    // 4 vertices.
+    std::vector<vertex_ptr_t> vertices;
+    for (auto p : points) {
+      vertices.push_back(std::make_shared<vertex_t>(p));
+    }
 
     // 6 edges.
+    std::vector<Edge> edges;
     Edge e1{vertices[0], vertices[1]};
     Edge e2{vertices[0], vertices[2]};
     Edge e3{vertices[0], vertices[3]};
@@ -30,6 +35,7 @@ namespace simploce {
     edges.push_back(e6);
 
     // 4 triangles.
+    std::vector<Triangle> triangles;
     Triangle t1{vertices[0], vertices[1], vertices[2]};
     Triangle t2{vertices[0], vertices[1], vertices[3]};
     Triangle t3{vertices[0], vertices[2], vertices[3]};
@@ -39,7 +45,6 @@ namespace simploce {
     triangles.push_back(t3);
     triangles.push_back(t4);
         
-    return std::make_pair(triangles, edges);
-    
+    return TriangulatedSurface{vertices, triangles, edges};    
   }
 }
