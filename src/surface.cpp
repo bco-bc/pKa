@@ -26,9 +26,9 @@ namespace simploce {
     }    
   }
 
-  TriangulatedSurface Surface::triangulate(const Triangulator& triangulator)
+  TriangulatedSurface Surface::triangulate(const triangulator_ptr_t& triangulator)
   {
-    return triangulator.generate(points_);
+    return triangulator->generate(points_);
   }
 
   area_t Surface::area() const

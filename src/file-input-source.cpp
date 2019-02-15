@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <memory>
 
 namespace simploce {
   
@@ -27,9 +28,14 @@ namespace simploce {
     return source_;
   }
 
-  std::string  FileInputSource::getSourceId() const
+  std::string FileInputSource::sourceId() const
   {
     return sourceId_;
+  }
+
+  input_source_ptr_t FileInputSource::make(const std::string &fileName)
+  {
+    return std::make_shared<FileInputSource>(fileName);
   }
   
 }

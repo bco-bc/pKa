@@ -125,7 +125,7 @@ namespace simploce {
   
   void PDBReader::parse(const input_source_ptr_t &source) const
   {
-    std::string sourceId = source->getSourceId();
+    std::string sourceId = source->sourceId();
     std::vector<std::string> items = source->asStrings();
     if ( items.empty() ) {
       throw std::domain_error(sourceId + ": Input source is empty");
@@ -142,10 +142,15 @@ namespace simploce {
     handler_->end();
   }
 
+  chem_reader_ptr_t PDBReader::make()
+  {
+    return std::make_shared<PDBReader>();
+  }
+
 
   PDBReaderHelper::PDBReaderHelper(const content_handler_ptr_t& handler,
 				   const input_source_ptr_t& source) :
-    lineNumber_{0}, handler_{handler}, sourceId_{source->getSourceId()},
+    lineNumber_{0}, handler_{handler}, sourceId_{source->sourceId()},
     items_{source->asStrings()}, last_{}
   {
     last_ = items_.end();

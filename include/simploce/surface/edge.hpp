@@ -32,6 +32,8 @@ namespace simploce {
     
   private:
 
+    static id_t ID;
+
     vertex_ptr_t v1_;
     vertex_ptr_t v2_;
   };

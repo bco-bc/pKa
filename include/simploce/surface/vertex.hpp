@@ -27,6 +27,12 @@ namespace simploce {
     Vertex(const position_t& r, const normal_t& n);
 
     /**
+     * Returns unique identifier value.
+     * @return Value > 0.
+     */
+    std::size_t id() const;
+    
+    /**
      * Returns position.
      */
     const position_t& position() const;
@@ -42,14 +48,16 @@ namespace simploce {
     void reset(const position_t& r, const normal_t& n);
 
     /**
-     * Returns unique identifier value.
-     * @return Value > 0.
+     * Returns vertex.
      */
-    std::size_t id() const;
-    
+    static vertex_ptr_t make(const position_t& r);
+
   private:
 
-    using id_t = Id<Vertex,std::size_t>;
+    /**
+     * Identifier type.
+     */
+    using id_t = Id<Vertex, std::size_t>;
 
     id_t id_;
     position_t r_;

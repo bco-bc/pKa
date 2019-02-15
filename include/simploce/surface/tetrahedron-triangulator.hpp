@@ -14,6 +14,11 @@ namespace simploce {
      * @param points - Surface points. Its size must be exactly 4.
      */
     TriangulatedSurface generate(const std::vector<position_t>& points) const;
+
+    /**
+     * Returns triangulator.
+     */
+    static triangulator_ptr_t make();
     
   };
 }

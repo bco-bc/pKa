@@ -27,8 +27,8 @@ int main()
   std::cout << surface << std::endl;
 
 
-  TetrahedronTriangulator tri;
-  TriangulatedSurface tsurface = surface.triangulate(tri);
+  triangulator_ptr_t triangulator = TetrahedronTriangulator::make();
+  TriangulatedSurface tsurface = surface.triangulate(triangulator);
   std::cout << std::endl;
   std::cout << "Surface is triangulated:    " << std::endl;
   std::cout << tsurface << std::endl;  

@@ -22,6 +22,11 @@ namespace simploce {
      * @param source - PDB structure.
      */
     void parse(const input_source_ptr_t &source) const override;
+
+    /**
+     * Returns a PDB chemical content reader.
+     */
+    static chem_reader_ptr_t make();
     
   private:
     

@@ -43,11 +43,16 @@ namespace simploce {
     return id_();
   }
 
+  vertex_ptr_t Vertex::make(const position_t& r)
+  {
+    return std::make_shared<Vertex>(r);
+  }
+
   std::ostream& operator << (std::ostream& stream, const Vertex& v)
   {
     stream.setf(std::ios::scientific);
     stream.precision(PRECISION);
-    stream << v.id() << SPACE << v.position() << SPACE << v.normal();
+    stream << std::setw(WIDTH) << v.id() << SPACE << v.position() << SPACE << v.normal();
     return stream;
   }
   

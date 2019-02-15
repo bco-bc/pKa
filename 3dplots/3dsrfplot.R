@@ -3,7 +3,7 @@
 library("rgl")
 
 # Read surface
-data<-scan(file="../../work/dotted-surface.dat")
+data<-scan(file="/localdisk/pKa/dotted.srf")
 
 # Create x,y,z vectors.
 nsp<-data[1]               #  Number of surface points

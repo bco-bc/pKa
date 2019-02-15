@@ -32,7 +32,7 @@ namespace simploce {
      * @param triangulator - Triangulation algorithme.
      * @return Triangulated surface.
      */
-    TriangulatedSurface triangulate(const Triangulator& triangulator);
+    TriangulatedSurface triangulate(const triangulator_ptr_t& triangulator);
 
     /**
      * Returns surface area.

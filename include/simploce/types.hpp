@@ -93,17 +93,11 @@ namespace simploce {
    * Triangulator type.
    */
   class Triangulator;
-  using triangulator_t = Triangulator;
 
   /**
    * Triangulator pointer type.
    */
-  using triangular_ptr_t = std::shared_ptr<triangulator_t>;  
-
-  /**
-   * Particle type.
-   */
-  using particle_t = std::tuple<position_t, radius_t, charge_t>;
+  using triangulator_ptr_t = std::shared_ptr<Triangulator>;
 
   /**
    * Chemical content reader.
@@ -134,6 +128,36 @@ namespace simploce {
    * Molecular input source pointer type.
    */
   using input_source_ptr_t = std::shared_ptr<InputSource>;
+
+  /**
+   * Atom.
+   */
+  class Atom;
+
+  /**
+   * Atom specification (type).
+   */
+  class AtomSpec;
+
+  /**
+   * Atom specification pointer type.
+   */
+  using atom_spec_ptr_t = std::shared_ptr<AtomSpec>;
+
+  /**
+   * Atom specifications catalog.
+   */
+  class AtomCatalog;
+
+  /**
+   * Atom catalog pointer type.
+   */
+  using atom_catalog_ptr_t = std::shared_ptr<AtomCatalog>;
+
+  /**
+   * Protein structure.
+   */
+  class ProteinStructure;
 }
 
 #endif

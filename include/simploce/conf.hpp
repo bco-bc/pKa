@@ -22,7 +22,12 @@ namespace simploce {
    * A small number.
    */
   const double SMALL = 1.0e-07;
-  
+
+  /**
+   * Radius of water. In nm.
+   */
+  const double R_WATER{0.14};
+
 }
 
 #endif

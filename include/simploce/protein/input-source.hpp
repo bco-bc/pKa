@@ -23,7 +23,7 @@ namespace simploce {
     /**
      * Get a source identifier, if available.
      */
-    virtual std::string getSourceId() const = 0;
+    virtual std::string sourceId() const = 0;
   };
   
 }

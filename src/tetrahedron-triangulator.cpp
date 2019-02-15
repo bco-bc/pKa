@@ -47,4 +47,9 @@ namespace simploce {
         
     return TriangulatedSurface{vertices, triangles, edges};    
   }
+
+  triangulator_ptr_t TetrahedronTriangulator::make()
+  {
+    return std::make_shared<TetrahedronTriangulator>();
+  }
 }

@@ -2,6 +2,7 @@
 #define FILE_INPUT_SOURCE_HPP
 
 #include "input-source.hpp"
+#include "../types.hpp"
 
 #include <string>
 #include <vector>
@@ -26,7 +27,12 @@ namespace simploce {
     /**
        @return Input file name.
     */
-    std::string getSourceId() const override;
+    std::string sourceId() const override;
+
+    /**
+     * Returns input source.
+     */
+    static input_source_ptr_t make(const std::string &fileName);
     
   private:
     
