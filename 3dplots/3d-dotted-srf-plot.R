@@ -2,7 +2,7 @@
 #
 library("rgl")
 
-# Read surface
+# Read dotted surface
 data<-scan(file="/home/juffer/BCO/work/dotted.srf")
 
 # Create x,y,z vectors.
