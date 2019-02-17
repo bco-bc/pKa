@@ -14,6 +14,11 @@ namespace simploce {
   public:
 
     /**
+     * Identifier type.
+     */
+    using id_t = Id<Vertex, std::size_t>;
+
+    /**
      * Constructor.
      * @param r - Position. Its norm must be larger than 0.
      */
@@ -53,11 +58,6 @@ namespace simploce {
     static vertex_ptr_t make(const position_t& r);
 
   private:
-
-    /**
-     * Identifier type.
-     */
-    using id_t = Id<Vertex, std::size_t>;
 
     id_t id_;
     position_t r_;

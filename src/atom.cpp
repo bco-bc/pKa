@@ -47,5 +47,9 @@ namespace simploce {
     return spec_->radius();
   }
 
-  id_t Atom::ID{1};
+  atom_spec_ptr_t Atom::spec() const
+  {
+    return spec_;
+  }
+
 }

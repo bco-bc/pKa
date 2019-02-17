@@ -6,14 +6,15 @@
 namespace simploce {
 
   /**
-   * Relies on spherical triangulated surfaces to triangular an arbitrary set of surface points.
+   * Relies on spherical triangulated surfaces to triangular an arbitrary set of surface points. It
+   * will try to match the requested number of triangles as closely as possible.
    */
   class SphereTriangulator : public Triangulator {
   public:
 
     /**
      * Constructor.
-     *  @param ntriangles - Requested number of triangles. Should be one of 60, 240, or 960.
+     *  @param ntriangles - Requested number of triangles. Typical values includes multiples of 60.
      */
     SphereTriangulator(std::size_t ntriangles);
     
@@ -21,7 +22,7 @@ namespace simploce {
 
     /**
      * Returns triangulator.
-     * @param ntriangles - Requested number of triangles. Should be one of 60, 240, or 960.
+     * @param ntriangles - Requested number of triangles. Typical values includes multiples of 60.
      */
     static triangulator_ptr_t make(std::size_t ntriangles);
 

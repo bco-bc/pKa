@@ -1,4 +1,9 @@
+# Prefix 
 PREFIX = /home/ajuffer
+
+# Location of sim-util header files.
+SIMUTIL = /home/ajuffer/BCO/sim-util
+
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -31,8 +36,6 @@ LOBJ = $(SRC:.cpp=.lo)
 TOBJ = $(TESTS:.cpp=.o)
 TEXE = $(TESTS:.cpp=)
 AEXE = $(APPS:.cpp=)
-
-SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
 
 # For g++ >= 5.4
 CC = g++

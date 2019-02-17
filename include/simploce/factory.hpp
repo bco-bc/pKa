@@ -1,7 +1,7 @@
 #ifndef FACTORY_HPP
 #define FACTORY_HPP
 
-#include "./types.hpp"
+#include "types.hpp"
 
 namespace simploce {
 
@@ -14,8 +14,10 @@ namespace simploce {
 
     /**
      * Returns a triangulator.
+     * @param ntriangles - Requested number of triangles.
+     * @return Triangulator.
      */
-    static triangulator_ptr_t triangulator();
+    static triangulator_ptr_t triangulator(std::size_t ntriangles);
 
   };
 }

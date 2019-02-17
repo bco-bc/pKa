@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
   Format format{pdb};
   std::string fnOutputDottedSurface{"dotted.srf"};
   std::string fnOutputTriangulatedSurface{"triangulated.srf"};
+  std::size_t ntriangles{240};
   
   po::options_description usage("Usage");
   usage.add_options()
@@ -41,6 +42,9 @@ int main(int argc, char *argv[])
 
     ("pdb", "Assume PDB format for protein structure. This is the default.")
     ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
+
+    ("number-of-triangles", po::value<std::size_t>(&ntriangles),
+     "Requested number of triangles. Default is 240.")
     
     ("help", "Help message")
     ;
@@ -69,6 +73,9 @@ int main(int argc, char *argv[])
   }
   if ( vm.count("gmx") ) {
     format = gmx;
+  }
+  if ( vm.count("number-of-triangles") ) {
+    ntriangles = vm["number-of-triangles"].as<std::size_t>();
   }
 
   input_source_ptr_t inputSource = FileInputSource::make(fnInputProtein);
@@ -118,7 +125,7 @@ int main(int argc, char *argv[])
 	    << fnOutputDottedSurface << "'." << std::endl;
 
   // Triangulate.
-  triangulator_ptr_t triangulator = Factory::triangulator();
+  triangulator_ptr_t triangulator = Factory::triangulator(ntriangles);
   TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator);
   
   // Write surface to output file.

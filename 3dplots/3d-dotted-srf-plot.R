@@ -3,7 +3,7 @@
 library("rgl")
 
 # Read surface
-data<-scan(file="/localdisk/pKa/dotted.srf")
+data<-scan(file="/home/juffer/BCO/work/dotted.srf")
 
 # Create x,y,z vectors.
 nsp<-data[1]               #  Number of surface points
@@ -18,5 +18,7 @@ for (j in 1:nsp) {
     z[j] <- data[j3 +1]
   }
 }
-plot3d(x, y, z, type = "p")
 
+# Draw dotted surface.
+open3d()
+plot3d(x, y, z, type = "p")

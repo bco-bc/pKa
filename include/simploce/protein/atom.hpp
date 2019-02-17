@@ -63,10 +63,13 @@ namespace simploce {
      */
     radius_t radius() const;
 
+    /**
+     * Returns specification/type.
+     */
+    atom_spec_ptr_t spec() const;
+
   private:
-
-    static id_t ID;
-
+    
     id_t id_;
     std::string name_;
     position_t r_;

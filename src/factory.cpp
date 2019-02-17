@@ -15,10 +15,10 @@ namespace simploce {
     return atomCatalog_;
   }
 
-  triangulator_ptr_t Factory::triangulator()
+  triangulator_ptr_t Factory::triangulator(std::size_t ntriangles)
   {
     if ( !triangulator_ ) {
-      triangulator_ = SphereTriangulator::make(60);
+      triangulator_ = SphereTriangulator::make(ntriangles);
     }
     return triangulator_;
   }

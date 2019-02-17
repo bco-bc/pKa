@@ -3,6 +3,7 @@
 #include "simploce/surface/triangle.hpp"
 #include "simploce/surface/vertex.hpp"
 #include "simploce/conf.hpp"
+#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 
 namespace simploce {
@@ -19,10 +20,14 @@ namespace simploce {
 					   const std::vector<Edge>& edges) :
     vertices_{vertices}, triangles_{triangles}, edges_{edges}
   {
-    if ( eulerCharacteristic(vertices_, triangles_, edges_) != 2 ) {
-      throw std::domain_error(
-        "TriangulatedSurface: Euler characteristic is not equals to 2."
-      );
+
+    int euler = eulerCharacteristic(vertices_, triangles_, edges_);
+    if ( euler != 2 ) {
+      std::string v = boost::lexical_cast<std::string, int>(euler);
+      std::string msg = 
+	"TriangulatedSurface: Euler characteristic is not equals to 2. Value is " + v + ".";
+      //throw std::domain_error(msg);
+      std::clog << "WARNING. " << msg << std::endl;
     }
   }
 

@@ -15,21 +15,9 @@ namespace simploce {
     /**
      * Constructor.
      * @param title - Descriptive title
-     */
-    ProteinStructure(const std::string& title);
-
-    /**
-     * Constructor.
-     * @param title - Descriptive title
      * @param atoms - Atoms
      */
     ProteinStructure(const std::string& title, const std::vector<Atom>& atoms);
-
-    /**
-     * Sets atoms.
-     * @param atoms - Atoms. Previously set atoms are lost.
-     */
-    void atoms(const std::vector<Atom>& atoms);
 
     /**
      * Returns title.
