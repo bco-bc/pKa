@@ -2,7 +2,7 @@
 PREFIX = /home/ajuffer
 
 # Location of sim-util header files.
-SIMUTIL = /home/ajuffer/BCO/sim-util
+SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
 
 
 VPATH = ../include/simploce/surface \

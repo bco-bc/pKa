@@ -43,6 +43,11 @@ namespace simploce {
     return id_();
   }
 
+  void Vertex::reset(const position_t& r)
+  {
+    r_ = r;
+  }
+
   vertex_ptr_t Vertex::make(const position_t& r)
   {
     return std::make_shared<Vertex>(r);

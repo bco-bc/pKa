@@ -24,6 +24,11 @@ namespace simploce {
   const double SMALL = 1.0e-07;
 
   /**
+   * A large number.
+   */
+  const double LARGE = 1.0e+30;
+
+  /**
    * Radius of water. In nm.
    */
   const double R_WATER{0.14};

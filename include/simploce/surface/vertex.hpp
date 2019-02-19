@@ -48,6 +48,12 @@ namespace simploce {
     const normal_t& normal() const;
 
     /**
+     * Resets position. Normal is not affected.
+     * @param r - Position.  Its norm must be larger than 0.
+     */
+    void reset(const position_t& r);
+
+    /**
      * Resets position and unit normal vector at r.
      */
     void reset(const position_t& r, const normal_t& n);

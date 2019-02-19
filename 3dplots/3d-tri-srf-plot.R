@@ -3,7 +3,8 @@
 library("rgl")
 
 # Read dotted surface
-data<-scan(file="/home/juffer/BCO/work/dotted.srf")
+#data<-scan(file="/home/juffer/BCO/work/dotted.srf")
+data<-scan(file="/localdisk/pKa/dotted.srf")
 
 # Create x,y,z vectors.
 nsp<-data[1]               #  Number of surface points
@@ -24,7 +25,8 @@ open3d()
 plot3d(x, y, z, type = "p", col = "steelblue")
 
 # Read triangulated surface
-data<-scan(file="/home/juffer/BCO/work/triangulated.srf")
+#data<-scan(file="/home/juffer/BCO/work/triangulated.srf")
+data<-scan(file="/localdisk/pKa/triangulated.srf")
 
 # Draw edges.
 nvertices<-data[1]

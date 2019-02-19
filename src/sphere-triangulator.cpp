@@ -5,12 +5,16 @@
 #include "simploce/surface/triangle.hpp"
 #include "simploce/util/map2.hpp"
 #include "simploce/conf.hpp"
+#include "simploce/util/util.hpp"
+#include "simploce/util/entity-range.hpp"
 #include "boost/multi_array.hpp"
 #include <tuple>
 #include <cmath>
 #include <utility>
 #include <memory>
 #include <cstdint>
+#include <thread>
+#include <future>
 
 namespace simploce {
 
@@ -20,7 +24,59 @@ namespace simploce {
   using tri_t = std::tuple<std::size_t, std::size_t, std::size_t>;
   using tri_srf_t = std::pair<std::vector<vertex_ptr_t>, std::vector<tri_t>>;
 
-  static const std::size_t NA = INT_MAX;
+  using entity_range_t = EntityRange<vertex_ptr_t>;
+
+  struct MappingResult {
+    MappingResult(std::vector<vertex_ptr_t> vertices,
+		  const entity_range_t& range) : vertices_{vertices}, range_{range} {}
+    std::vector<vertex_ptr_t> vertices_;
+    entity_range_t range_;
+  };
+  
+  static const std::size_t NA = SIZE_MAX;
+
+  /**
+   * @param vertices - Original set of vertices.
+   * @param range - Range of vertices to be mapped/replaced by surface points.
+   * @return Mapped vertices. Contains only mapped vertices.
+   */
+  static MappingResult mapper_(std::vector<vertex_ptr_t>& vertices,
+			       const entity_range_t& range,
+			       const std::vector<position_t>& points)
+  {
+    static const real_t MIN = 0.5 * std::sqrt(2);
+    static const real_t MAX = 1.0;
+    
+    std::vector<vertex_ptr_t> mapped{};
+    for (std::size_t k = range.start(); k != range.end(); ++k ) {
+      bool isMapped{false};
+      const vertex_ptr_t& vertex = vertices[k];
+      position_t r = vertex->position();
+      length_t R = norm<length_t>(r);
+      position_t rMapped = r;
+      length_t dmin2{LARGE};
+      for (const position_t& point : points) {
+	length_t Rp = norm<real_t>(point);
+	real_t cosine = inner<real_t>(r, point)/(R * Rp);
+	if ( cosine >= MIN && cosine <= MAX ) {
+	  length_t b = Rp * cosine;
+	  real_t d2 = Rp * Rp - b * b;
+	  if ( d2 < dmin2 ) {
+	    dmin2 = d2;
+	    rMapped = point;
+	    isMapped = true;
+	  }
+	}
+      }
+      if ( !isMapped ) {
+	std::clog << "WARNING: Vertex with id " << vertex->id()
+		  << " could not be mapped onto dotted surface." << std::endl;
+      }
+      vertex->reset(rMapped);
+      mapped.push_back(vertex);
+    }
+    return MappingResult{vertices, range};
+  }
 
   /**
    * Sets up the coordinates and faces (pentagons) of a dodecahedron.
@@ -319,6 +375,51 @@ namespace simploce {
     // Done.
     return std::make_pair(vertices, triangles);     
   }
+
+  static tri_srf_t mapToDottedSurface_(const tri_srf_t& srf, const std::vector<position_t>& points)
+  {
+    std::clog << "Mapping onto dotted surface..." << std::endl;
+    
+    std::vector<vertex_ptr_t> vertices = std::get<0>(srf);
+    const std::vector<tri_t> tris = std::get<1>(srf);
+    
+    std::vector<entity_range_t> ranges = createRanges(vertices);
+    std::vector<std::future<MappingResult>> futures{};
+    std::size_t ntasks = ranges.size() - 1;
+    std::clog << "Number of concurrent tasks: " << ntasks << std::endl;
+    for (std::size_t k = 0; k != ntasks; ++k) {
+      const entity_range_t& range = ranges[k];
+      futures.push_back(std::async(std::launch::async, 
+                                   mapper_,
+                                   std::ref(vertices),
+                                   std::ref(range),
+				   std::ref(points)
+                                   ));
+    }
+    // Wait for these tasks to complete in other threads.
+    std::vector<MappingResult> results = wait_for_all<MappingResult>(futures);
+
+    // Current thread.
+    const entity_range_t& range = ranges[ranges.size() -1];
+    MappingResult result = mapper_(vertices, range, points);
+    results.push_back(result);
+
+    // Replace vertices.
+    for (auto& result : results) {
+      const std::vector<vertex_ptr_t>& vptrs = result.vertices_;
+      const entity_range_t& range = result.range_;
+      for (std::size_t k = range.start(); k != range.end(); k++) {
+	vertex_ptr_t ptr = vptrs[k];
+	std::size_t index = ptr->id() - 1;
+	vertices[index] = ptr;
+      }
+    }
+
+    // Done.
+    std::clog << "Done." << std::endl;
+    
+    return std::make_pair(vertices, tris);
+  }
   
   /**
    * Creates final triangulated surface.
@@ -393,6 +494,7 @@ namespace simploce {
       srf = refine_(radius, srf);
       ntr = std::get<1>(srf).size();
     }
+    srf =  mapToDottedSurface_(srf, points);
     return makeFrom_(srf);
   }
 
