@@ -7,6 +7,7 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
+        ../include/simploce/bem \
         ../include/simploce \
         ../src \
         ../tests \
@@ -25,7 +26,8 @@ SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp ver
       tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
       pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
-      protein-structure-content-handler.cpp sphere-triangulator.cpp
+      protein-structure-content-handler.cpp sphere-triangulator.cpp \
+      kernels.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp
 

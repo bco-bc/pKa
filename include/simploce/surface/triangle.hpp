@@ -21,6 +21,11 @@ namespace simploce {
     Triangle(const vertex_ptr_t& v1, const vertex_ptr_t& v2, const vertex_ptr_t& v3);
 
     /**
+     * Returns mid point of triangle. This assumes the triangle to be flat.
+     */
+    position_t midpoint() const;
+
+    /**
      * Returns a unit vector perpendicular to the flat surface defined by the three vertices. The 
      * orientation is defined by the vertices' unit vectors.
      */

@@ -39,6 +39,16 @@ namespace simploce {
   using charge_t = real_t;
 
   /**
+   * Type for (relative) permittivity.
+   */
+  using permittivity_t = real_t;
+
+  /**
+   * Ionic strength type.
+   */
+  using ionic_strength_t = real_t;
+
+  /**
    * Position type.
    */
   using position_t = cvector<real_t, 1>;
@@ -98,6 +108,16 @@ namespace simploce {
    * Triangulator pointer type.
    */
   using triangulator_ptr_t = std::shared_ptr<Triangulator>;
+
+  /**
+   * Triangulated surface.
+   */
+  class TriangulatedSurface;
+
+  /**
+   * Triangulated surface type.
+   */
+  using tri_surface_t = TriangulatedSurface;
 
   /**
    * Chemical content reader.

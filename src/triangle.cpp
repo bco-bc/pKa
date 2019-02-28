@@ -14,15 +14,27 @@ namespace simploce {
     }
   }
 
+  position_t Triangle::midpoint() const
+  {
+    return position_t{ (v1_->position() + v2_->position() + v3_->position() ) / 3.0 };
+  }
+
   normal_t Triangle::normal() const
   {
-    dist_vect_t r12 = v2_->position() - v1_->position();  // From 1 to 2.
-    dist_vect_t r13 = v3_->position() - v1_->position();  // From 1 to 2.
-    normal_t normal = cross(r12, r13);
-    normal /= norm<real_t>(normal);
-    normal_t aveNormal = (v1_->normal() + v2_->normal() + v3_->normal() ) / 3.0;
-    real_t ip = inner<real_t>(normal,  aveNormal);
-    return ip < 0 ? -1.0 * normal : normal;
+    static normal_t normal{};
+    static firstTime{false};
+    
+    if ( firstTime ) {
+      dist_vect_t r12 = v2_->position() - v1_->position();  // From 1 to 2.
+      dist_vect_t r13 = v3_->position() - v1_->position();  // From 1 to 2.
+      normal = cross(r12, r13);
+      normal /= norm<real_t>(normal);
+      normal_t aveNormal = (v1_->normal() + v2_->normal() + v3_->normal() ) / 3.0;
+      real_t ip = inner<real_t>(normal,  aveNormal);
+      normal = ip < 0 ? -1.0 * normal : normal;
+      firsTime = false;
+    }
+    return normal;
   }
 
   /**
