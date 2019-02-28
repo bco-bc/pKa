@@ -63,6 +63,13 @@ namespace simploce {
      */
     static vertex_ptr_t make(const position_t& r);
 
+    /**
+     * Returns vertex.
+     * @param r - Position.
+     * @param n - Normal.
+     */
+    static vertex_ptr_t make(const position_t& r, const normal_t& n);
+
   private:
 
     id_t id_;

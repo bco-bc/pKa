@@ -2,6 +2,7 @@
 #define TYPES_HPP
 
 #include "simploce/util/cvector.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
 #include <utility>
 #include <memory>
 #include <tuple>
@@ -13,6 +14,15 @@ namespace simploce {
    */
   using real_t = double;
 
+  /**
+   * Matrix type for linear algebra.
+   */
+  using matrix_t = boost::numeric::ublas::matrix<real_t>;
+
+  /**
+   * Vector type for linear algebra.
+   */
+  using vector_t = boost::numeric::ublas::vector<real_t>;
   /**
    * Length type.
    */
@@ -115,9 +125,9 @@ namespace simploce {
   class TriangulatedSurface;
 
   /**
-   * Triangulated surface type.
+   * Triangulated surface pointer type.
    */
-  using tri_surface_t = TriangulatedSurface;
+  using tri_surface_ptr_t = std::shared_ptr<TriangulatedSurface>;
 
   /**
    * Chemical content reader.

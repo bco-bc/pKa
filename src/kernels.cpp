@@ -4,6 +4,7 @@
 #include "simploce/util/math-constants.hpp"
 #include "simploce/util/entity-range.hpp"
 #include "simploce/util/util.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
 #include <future>
 #include <thread>
 
@@ -11,41 +12,68 @@ namespace simploce {
 
   struct KernelResult {
     KernelResult(std::vector<real_t>& mtrx) : matrix{mtrx} {}
-    std::vector<real_t> matrix;
+    std::vector<real_t>& matrix;
   };
 
   using result_t = KernelResult;
-
   using entity_range_t = EntityRange<Triangle>;
 
   const real_t FOUR_PI = 4.0 * MathConstants<real_t>::PI;
-  
-  void result_t L0_(const std::vector<Triangle>& triangles,
-		    const real_t& epsRatio, std::vector<real_t>& L)
+
+  static real_t L0_ij_(const position_t& ri, const Triangle& triangle)
   {
+    position_t rj = triangle.midpoint();
+    area_t area = triangle.area();
+    normal_t nj = triangle.normal();
+    dist_vect_t rji = rj - ri;
+    real_t imp = inner<real_t>(rji, nj);
+    length_t R = norm<real_t>(rji);    
+    real_t t3 = FOUR_PI * R * R * R;
+    real_t lij = area * imp / t3;
+    return lij;
+  }
+
+  /**
+   * Zero ionic strength. Collocation points are vertices. Integration over surface 
+   * assumes the kernel to be constant across a triangle ("midpoint rule").
+   */
+  static void L0_(const TriangulatedSurface& surface,
+		  const permittivity_t& epsI,
+		  const permittivity_t& epsO,
+		  matrix_t& L)
+  {
+    const std::vector<Triangle>& triangles = surface.triangles();
+    const std::vector<vertex_ptr_t>& vertices = surface. vertices();
+
+    // Ratio of permittivities.
+    const real_t ratio = epsO/epsI;
+    const real_t factor = 2.0 * (ratio - 1.0) / (1.0 + ratio);
+
+    // Initialize kernel.
     std::size_t ntr = triangles.size();
-    L.clear();
-    L.resize(ntr * ntr, 0.0);
-    
+    L.resize(ntr, ntr, false);
+
+    // Compute kernel elements.
     for (std::size_t i = 0; i != ntr; ++i) {
       const Triangle& ti = triangles[i];
-      position_t r0 = ti.midpoint();
-      for (std::size_t j = ; j != ntr; ++j) {
+      position_t ri = ti.midpoint();
+      
+      for (std::size_t j = 0; j != i; ++j) {
 	const Triangle& tj = triangles[j];
-	position_t r = tj.midpoint();
-	normal_t n = tj.normal();
-	dist_vect_t disv = r - r0;
-	real_t imp = inner<real_t>(disv, n);
-	length_t R = norm<real_t>(disv);
-	
-	real_t t3 = 2.0 / (1.0 + epsRatio);
-	real_t t4 = FOUR_PI * R;
-	real_t t5 = t4 * R * R;
-	real_t lij = t3 * ( 1.0 - epsRatio) * imp / t5;
-	L[i * ntr + j] += lij;
+	real_t lij = -factor * L0_ij_(ri, tj);
+	L(i,j) = lij;
       }
+
+      L(i,i) = 1.0;
+
+      // Keep 'j < ntr'!
+      for (std::size_t j = i+1; j < ntr; ++j) {
+	const Triangle& tj = triangles[j];
+	real_t lij = -factor * L0_ij_(ri, tj);
+	L(i,j) = lij;
+      }
+      
     }
-    return result_t{L};
   }
 
   Kernels::Kernels(const permittivity_t& epsI,
@@ -61,36 +89,9 @@ namespace simploce {
     }
   }
 
-  void Kernels::L0(const TriangulatedSurface& surface, std::vector<real_t>& L)
+  void Kernels::L0(const TriangulatedSurface& surface, matrix_t& L)
   {
-    const real_t epsRatio = epsO_ / epsI_; 
-    const std::vector<Triangle>& triangles = surface.triangles();
-    std::size_t ntr = triangles.size();
-    std::vector<entity_range_t> ranges = createRanges(triangles);
-    
-    std::vector<std::future<result_t> > futures{};
-    std::size_t ntasks = ranges.size() - 1;
-    for (std::size_t k = 0; k != ntasks; ++k) {
-      const entity_range_t& range = ranges[k];
-      futures.push_back(
-        std::async(std::launch::async,
-		   L0_,
-		   std::ref(triangles),
-		   std::ref(range),
-		   std::ref(epsRatio))
-      );
-    }
-
-    // Wait for these tasks to complete in other threads.
-    std::vector<result_t> results = wait_for_all<result_t>(futures);
-
-    // One remaining task in current thread.
-    const entity_range_t& range = ranges[ranges.size() -1];
-    result_t result = L0_(triangles, range, epsRatio);
-    results.push_back(result);
-
-    L.clear();
-    L.resize(ntr * ntr, 0.0);
-    for (
+    L0_(surface, epsI_, epsO_, L);
   }
+
 }

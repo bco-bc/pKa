@@ -5,6 +5,7 @@
 #include "simploce/conf.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <string>
 
 namespace simploce {
 
@@ -53,6 +54,63 @@ namespace simploce {
       area += t.area();
     }
     return area;
+  }
+
+  tri_surface_ptr_t TriangulatedSurface::make(std::istream& stream)
+  {
+    std::vector<vertex_ptr_t> vertices{};
+    std::vector<Triangle> triangles{};
+    std::vector<Edge> edges{};
+    
+    // Buffer to read EOL.
+    std::string buffer;
+
+    // Vertices.
+    std::size_t nve, id;
+    stream >> nve;
+    std::getline(stream, buffer);        // Reads EOL.
+    real_t x,y,z;
+    real_t nx, ny, nz;
+    for (std::size_t i = 0; i != nve; ++i) {
+      stream >> id >> x >> y >> z >> nx >> ny >> nz;
+      position_t r{x, y, z};
+      normal_t n{nx, ny, nz};
+      vertices.push_back(Vertex::make(r, n));
+      std::getline(stream, buffer);        // Reads EOL.
+    }
+    
+    // Triangles.
+    std::size_t ntr;
+    stream >> ntr;
+    for (std::size_t i = 0; i != ntr; ++i) {
+      stream >> id;
+      id -= 1;
+      vertex_ptr_t v1 = vertices[id];
+      stream >> id;
+      id -= 1;
+      vertex_ptr_t v2 = vertices[id];
+      stream >> id;
+      id -= 1;
+      vertex_ptr_t v3 = vertices[id];
+      triangles.push_back(Triangle{v1, v2, v3});
+      std::getline(stream, buffer);        // Reads EOL.
+    }
+
+    // Edges.
+    std::size_t nedges;
+    stream >> nedges;
+    for (std::size_t i = 0; i != nedges; ++i) {
+      stream >> id;
+      id -= 1;
+      vertex_ptr_t v1 = vertices[id];
+      stream >> id;
+      id -= 1;
+      vertex_ptr_t v2 = vertices[id];
+      edges.push_back(Edge{v1, v2});
+      std::getline(stream, buffer);        // Reads EOL.
+    }
+    
+    return std::make_shared<TriangulatedSurface>(vertices, triangles, edges);
   }
   
   std::ostream& TriangulatedSurface::writeTo(std::ostream& stream) const

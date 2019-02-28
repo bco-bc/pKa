@@ -2,7 +2,7 @@
 PREFIX = /home/ajuffer
 
 # Location of sim-util header files.
-SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
+SIMUTIL = /home/ajuffer/BCO/sim-util
 
 
 VPATH = ../include/simploce/surface \
@@ -29,7 +29,8 @@ SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp ver
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
       kernels.cpp
 
-TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp
+TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
+        test-kernels.cpp
 
 APPS = s-tri-surface.cpp
 

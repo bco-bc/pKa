@@ -45,11 +45,16 @@ namespace simploce {
 
     /**
      * Writes this triangulated surface to an output stream.
-     * @param stream Output stream.
+     * @param stream - Output stream.
      * @return Output stream.
      */
-    std::ostream& writeTo(std::ostream& stream) const;    
-    
+    std::ostream& writeTo(std::ostream& stream) const;
+
+    /**
+     * Takes (reads) a triangulated surface from input stream.
+     */
+    static tri_surface_ptr_t make(std::istream& stream);
+
   private:
     
     std::vector<vertex_ptr_t> vertices_;

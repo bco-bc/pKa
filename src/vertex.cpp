@@ -19,13 +19,6 @@ namespace simploce {
   Vertex::Vertex(const position_t& r, const normal_t& n) :
     id_{id_t::next()}, r_{r}, n_{n}
   {
-    real_t length = norm<real_t>(n_);
-    if ( std::fabs(length - 1.0) > SMALL ) {
-      std::clog << "Norm normal: " << length << std::endl;
-      throw std::domain_error(
-        "Vertex: length of normal unit vector must be 1."
-      );
-    }
   }
 
   const position_t& Vertex::position() const
@@ -51,6 +44,11 @@ namespace simploce {
   vertex_ptr_t Vertex::make(const position_t& r)
   {
     return std::make_shared<Vertex>(r);
+  }
+
+  vertex_ptr_t Vertex::make(const position_t& r, const normal_t& n)
+  {
+    return std::make_shared<Vertex>(r, n);
   }
 
   std::ostream& operator << (std::ostream& stream, const Vertex& v)

@@ -4,6 +4,7 @@
 #include "simploce/types.hpp"
 #include <string>
 #include <memory>
+#include <stdexcept>
 
 using namespace simploce;
 

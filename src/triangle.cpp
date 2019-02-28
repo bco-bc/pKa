@@ -22,7 +22,7 @@ namespace simploce {
   normal_t Triangle::normal() const
   {
     static normal_t normal{};
-    static firstTime{false};
+    static bool firstTime{false};
     
     if ( firstTime ) {
       dist_vect_t r12 = v2_->position() - v1_->position();  // From 1 to 2.
@@ -32,7 +32,7 @@ namespace simploce {
       normal_t aveNormal = (v1_->normal() + v2_->normal() + v3_->normal() ) / 3.0;
       real_t ip = inner<real_t>(normal,  aveNormal);
       normal = ip < 0 ? -1.0 * normal : normal;
-      firsTime = false;
+      firstTime = false;
     }
     return normal;
   }
@@ -42,11 +42,18 @@ namespace simploce {
    */
   area_t Triangle::area() const
   {
-    real_t r12 = norm<real_t>(v1_->position() - v2_->position());
-    real_t r23 = norm<real_t>(v2_->position() - v3_->position());
-    real_t r31 = norm<real_t>(v3_->position() - v1_->position());
-    real_t s = (r12 + r23 + r31) / 2.0;
-    return area_t{std::sqrt(s * (s - r12) * (s - r23) * (s - r31))};
+    static area_t area{0};
+    static bool firstTime{false};
+    
+    if ( firstTime ) {
+      real_t r12 = norm<real_t>(v1_->position() - v2_->position());
+      real_t r23 = norm<real_t>(v2_->position() - v3_->position());
+      real_t r31 = norm<real_t>(v3_->position() - v1_->position());
+      real_t s = (r12 + r23 + r31) / 2.0;
+      area = std::sqrt(s * (s - r12) * (s - r23) * (s - r31));
+      firstTime = false;
+    }
+    return area;
   }
 
   std::ostream& Triangle::writeTo(std::ostream& stream) const

@@ -26,7 +26,7 @@ namespace simploce {
      * @param L - Upon return, holds kernel values of L. Its size corresponds to the number 
      * of collocation points.
      */
-    void L0(const TriangulatedSurface& surface, std::vector<real_t>& L);
+    void L0(const TriangulatedSurface& surface, matrix_t& L);
 
     /*
     void Lij0(double e_ratio,
