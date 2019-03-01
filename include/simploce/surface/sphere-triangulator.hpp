@@ -18,7 +18,8 @@ namespace simploce {
      */
     SphereTriangulator(std::size_t ntriangles);
     
-    TriangulatedSurface generate(const std::vector<position_t>& points) const override;
+    TriangulatedSurface generate(const std::vector<position_t>& points,
+				 bool spherical = false) const override;
 
     /**
      * Returns triangulator.

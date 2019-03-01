@@ -3,7 +3,6 @@
 #include "simploce/surface/triangle.hpp"
 #include "simploce/surface/vertex.hpp"
 #include "simploce/conf.hpp"
-#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <string>
 
@@ -24,11 +23,38 @@ namespace simploce {
 
     int euler = eulerCharacteristic(vertices_, triangles_, edges_);
     if ( euler != 2 ) {
-      std::string v = boost::lexical_cast<std::string, int>(euler);
-      std::string msg = 
-	"TriangulatedSurface: Euler characteristic is not equals to 2. Value is " + v + ".";
-      //throw std::domain_error(msg);
-      std::clog << "WARNING. " << msg << std::endl;
+      std::clog << "WARNING: The triangulated surface's Euler characteristic is not equal to 2. "
+		<< "Value is " << euler << "." << std::endl;
+    }
+    this->orientOutward();
+  }
+
+  void TriangulatedSurface::orientOutward()
+  {
+    for ( Triangle& triangle : triangles_ ) {
+      // Get the vertices.
+      std::tuple<vertex_ptr_t, vertex_ptr_t, vertex_ptr_t> vertices = triangle.vertices();
+
+      // Create three position vectors on a unit sphere, each representing a vertex.
+      position_t v1 = std::get<0>(vertices)->position();
+      v1 /= norm<real_t>(v1);
+      position_t v2 = std::get<1>(vertices)->position();
+      v2 /= norm<real_t>(v2);
+      position_t v3 = std::get<2>(vertices)->position();
+      v3 /= norm<real_t>(v3);
+
+      // Compute a normal vector.
+      dist_vect_t r12 = v2 - v1;  // From 1 to 2.
+      dist_vect_t r13 = v3 - v1;  // From 1 to 3.
+      normal_t normal = cross(r12, r13);
+
+      // Check orientation.
+      normal_t aveNormal = (v1 + v2 + v3 ) / 3.0;
+      real_t ip = inner<real_t>(normal,  aveNormal);
+      if ( ip < 0.0 ) {
+	// Pointing inward.
+	triangle.swapTwoVertices();
+      }
     }
   }
 

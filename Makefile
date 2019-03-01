@@ -2,7 +2,7 @@
 PREFIX = /home/ajuffer
 
 # Location of sim-util header files.
-SIMUTIL = /home/ajuffer/BCO/sim-util
+SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
 
 
 VPATH = ../include/simploce/surface \
@@ -18,8 +18,9 @@ INCLUDE = conf.hpp \
           triangulator.hpp sphere-triangulator.hpp \
           tetrahedron-triangulator.hpp nsc.hpp dotted-surface-generator.hpp \
           chem-reader.hpp pdb-reader.hpp input-source.hpp content-handler.hpp \
+          base-content-handler.hpp \
           file-input-source.hpp logger-content-handler.hpp \
-          protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp \
+          protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp atom-group.hpp \
           protein-structure-content-handler.hpp \
 
 SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
@@ -27,10 +28,10 @@ SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp ver
       pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
-      kernels.cpp
+      kernels.cpp base-content-handler.cpp atom-group.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
-        test-kernels.cpp
+        test-kernels.cpp test-read-protein-structure.cpp
 
 APPS = s-tri-surface.cpp
 

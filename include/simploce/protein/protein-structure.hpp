@@ -3,6 +3,8 @@
 
 #include "../types.hpp"
 #include <string>
+#include <iostream>
+#include <fstream>
 
 namespace simploce {
 
@@ -35,12 +37,34 @@ namespace simploce {
      */
     Surface dottedSurface() const;
 
+    /**
+     * Writes this protein structure to output stream.
+     * @param stream - Output stream.
+     * @return Output stream.
+     */    
+    std::ostream& writeTo(std::ostream& stream) const;
+
+    /**
+     * Takes (reads) a protein strcuture from input stream.
+     * @param stream - Input stream.
+     * @param catalog - Atom specifications catalog.
+     * @return protein structure.
+     */
+    static prot_struct_ptr_t make(std::istream& stream, const atom_catalog_ptr_t& catalog);
+
   private:
     
     std::string title_;
     std::vector<Atom> atoms_;
   };
 
+  /**
+   * Writes protein structure to output stream.
+   * @param stream - Output stream.
+   * @param structure - Protein structure.
+   * @return Output stream.
+   */
+  std::ostream& operator << (std::ostream& stream, const ProteinStructure& structure);  
   
 }
 

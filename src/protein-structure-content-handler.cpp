@@ -1,6 +1,7 @@
 #include "simploce/protein/protein-structure-content-handler.hpp"
 #include "simploce/protein/atom-catalog.hpp"
 #include "simploce/protein/atom-spec.hpp"
+#include "simploce/protein/atom-group.hpp"
 #include "simploce/protein/atom.hpp"
 #include "simploce/protein/protein-structure.hpp"
 #include <stdexcept>
@@ -8,13 +9,15 @@
 namespace simploce {
 
   static std::string title_{};
+  static std::vector<AtomGroup> atomGroups_{};
+  static AtomGroup atomGroup_{};
   static std::vector<Atom> atoms_{};  
   static std::string atomName_{};
   static position_t r_{};
 
   ProteinStructureContentHandler::
   ProteinStructureContentHandler(const atom_catalog_ptr_t& atomCatalog) :
-    LoggerContentHandler{}, atomCatalog_{atomCatalog} 
+    BaseContentHandler{}, atomCatalog_{atomCatalog} 
   {
     if ( !atomCatalog_ ) {
       throw std::domain_error("ProteinStructureContentHandler: atom catalog must be provided.");
@@ -23,8 +26,18 @@ namespace simploce {
 
   void ProteinStructureContentHandler::start(const std::string &title)
   {
+    atomGroups_.clear();
     atoms_.clear();
     simploce::title_ = title;
+  }
+
+  void ProteinStructureContentHandler::startAtomGroup(const std::string &atomGroupName)
+  {
+    atomGroup_ = AtomGroup{atomGroupName};   
+  }
+
+  void ProteinStructureContentHandler::endAtomGroup()
+  {
   }
 
   void ProteinStructureContentHandler::startAtom(const std::string &atomName)
@@ -42,6 +55,7 @@ namespace simploce {
     atom_spec_ptr_t spec = atomCatalog_->lookup(atomName_);
     Atom atom{atomName_, r_, spec};
     atoms_.push_back(atom);
+    
   }
 
   ProteinStructure ProteinStructureContentHandler::proteinStructure() const

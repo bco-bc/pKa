@@ -4,6 +4,7 @@
 #include "../types.hpp"
 #include "simploce/util/id.hpp"
 #include <string>
+#include <iostream>
 
 namespace simploce {
 
@@ -76,6 +77,14 @@ namespace simploce {
     atom_spec_ptr_t spec_;
     
   };
+
+  /**
+   * Write atom to output stream.
+   * @param stream - Output stream.
+   * @param atom - Atom.
+   * @return Output stream.
+   */
+  std::ostream& operator << (std::ostream& stream, const Atom& atom);
 }
 
 #endif

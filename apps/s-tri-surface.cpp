@@ -24,24 +24,28 @@ enum Format { pdb, gmx };
 int main(int argc, char *argv[])
 {
   std::string fnInputProtein{"1abc.pdb"};
+  std::string fnOutputProtein{"protein.structure"};
   Format format{pdb};
   std::string fnOutputDottedSurface{"dotted.srf"};
   std::string fnOutputTriangulatedSurface{"triangulated.srf"};
   std::size_t ntriangles{240};
+  bool spherical{false};
   
   po::options_description usage("Usage");
   usage.add_options()
     ("fn-input-protein", po::value<std::string>(&fnInputProtein),
      "Input file name of protein structure. Default is '1abc.pdb'.")
 
+    ("fn-output-protein", po::value<std::string>(&fnOutputProtein),
+     "Output file name of protein structure. Default is 'protein.structure'.")
     ("fn-output-dotted-surface", po::value<std::string>(&fnOutputDottedSurface),
      "Output file name of dotted surface. Default is 'dotted.srf'.")
-
     ("fn-output-triangulated-surface", po::value<std::string>(&fnOutputTriangulatedSurface),
      "Output file name of triangulated surface. Default is 'triangulated.srf'.")
 
     ("pdb", "Assume PDB format for protein structure. This is the default.")
     ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
+    ("spherical", "Create a spherical triangulated surface.")
 
     ("number-of-triangles", po::value<std::size_t>(&ntriangles),
      "Requested number of triangles. Default is 240.")
@@ -62,6 +66,9 @@ int main(int argc, char *argv[])
   if ( vm.count("fn-input-protein") ) {
     fnInputProtein = vm["fn-input-protein"].as<std::string>();
   }
+  if ( vm.count("fn-output-protein") ) {
+    fnOutputProtein = vm["fn-output-protein"].as<std::string>();
+  }
   if ( vm.count("fn-output-dotted-surface") ) {
     fnOutputDottedSurface = vm["fn-output-dotted-surface"].as<std::string>();
   }
@@ -73,6 +80,9 @@ int main(int argc, char *argv[])
   }
   if ( vm.count("gmx") ) {
     format = gmx;
+  }
+  if ( vm.count("spherical") ) {
+    spherical = true;
   }
   if ( vm.count("number-of-triangles") ) {
     ntriangles = vm["number-of-triangles"].as<std::size_t>();
@@ -99,6 +109,8 @@ int main(int argc, char *argv[])
     }
   };
 
+  std::ofstream ostream;
+
   // Read chemical content.
   atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
   std::shared_ptr<ProteinStructureContentHandler> contentHandler =
@@ -111,13 +123,19 @@ int main(int argc, char *argv[])
   std::clog << "Title: " << structure.title() << std::endl;
   std::clog << "Number of atoms: " << structure.size() << std::endl;
 
+  // Write protein structure to output file.
+  openOutputFile(ostream, fnOutputProtein);
+  ostream << structure << std::endl;
+  ostream.close();
+  std::clog << "Protein strcuture written to output file '"
+	    << fnOutputProtein << "'." << std::endl;
+
   // Generate dotted surface.
   Surface surface = structure.dottedSurface();
   std::clog << "Surface area (nm^2): " << surface.area() << std::endl;
   std::clog << "Volume (nm^3): " << surface.volume() << std::endl;
 
   // Write surface to output file.
-  std::ofstream ostream;
   openOutputFile(ostream, fnOutputDottedSurface);
   ostream << surface << std::endl;
   ostream.close();
@@ -126,7 +144,7 @@ int main(int argc, char *argv[])
 
   // Triangulate.
   triangulator_ptr_t triangulator = Factory::triangulator(ntriangles);
-  TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator);
+  TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator, spherical);
   
   // Write surface to output file.
   openOutputFile(ostream, fnOutputTriangulatedSurface);

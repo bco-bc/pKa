@@ -165,6 +165,11 @@ namespace simploce {
   class Atom;
 
   /**
+   * Atom pointer type.
+   */
+  using atom_ptr_t = std::shared_ptr<Atom>;
+
+  /**
    * Atom specification (type).
    */
   class AtomSpec;
@@ -188,6 +193,11 @@ namespace simploce {
    * Protein structure.
    */
   class ProteinStructure;
+
+  /**
+   * Protein structure pointer type.
+   */
+  using prot_struct_ptr_t = std::shared_ptr<ProteinStructure>;
 }
 
 #endif

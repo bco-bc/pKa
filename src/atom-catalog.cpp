@@ -15,7 +15,7 @@ namespace simploce {
   static radius_t R_O{R_WATER + 0.152};
   static radius_t R_N{R_WATER + 0.155};
   static radius_t R_S{R_WATER + 0.18};
-  static charge_t zero{0};
+  static charge_t zero{0.0};
 
   static void setup_(std::map<std::string, atom_spec_ptr_t>& specs)
   {

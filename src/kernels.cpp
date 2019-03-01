@@ -61,7 +61,7 @@ namespace simploce {
       for (std::size_t j = 0; j != i; ++j) {
 	const Triangle& tj = triangles[j];
 	real_t lij = -factor * L0_ij_(ri, tj);
-	L(i,j) = lij;
+	L(i,j) = -lij;
       }
 
       L(i,i) = 1.0;
@@ -70,7 +70,7 @@ namespace simploce {
       for (std::size_t j = i+1; j < ntr; ++j) {
 	const Triangle& tj = triangles[j];
 	real_t lij = -factor * L0_ij_(ri, tj);
-	L(i,j) = lij;
+	L(i,j) = -lij;
       }
       
     }

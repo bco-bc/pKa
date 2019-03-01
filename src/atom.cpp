@@ -1,5 +1,6 @@
 #include "simploce/protein/atom.hpp"
 #include "simploce/protein/atom-spec.hpp"
+#include "simploce/conf.hpp"
 #include <stdexcept>
 
 namespace simploce {
@@ -50,6 +51,14 @@ namespace simploce {
   atom_spec_ptr_t Atom::spec() const
   {
     return spec_;
+  }
+
+  std::ostream& operator << (std::ostream& stream, const Atom& atom)
+  {
+    stream << std::setw(WIDTH) << atom.id()();
+    stream << SPACE << std::setw(WIDTH) << atom.name();
+    stream << SPACE << atom.position();
+    return stream;
   }
 
 }

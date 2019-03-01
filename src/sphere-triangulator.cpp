@@ -7,7 +7,7 @@
 #include "simploce/conf.hpp"
 #include "simploce/util/util.hpp"
 #include "simploce/util/entity-range.hpp"
-#include "boost/multi_array.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
 #include <tuple>
 #include <cmath>
 #include <utility>
@@ -282,18 +282,18 @@ namespace simploce {
     std::size_t nve = vertices.size();
 
     // Keeps track of existing edges already split in two.
-    bool split[nve][nve];
+    boost::numeric::ublas::matrix<bool> split(nve, nve);
     for (std::size_t i = 0; i != nve; ++i) {
       for (std::size_t j = 0; j != nve; ++j) {
-	split[i][j] = false;
+	split(i,j) = false;
       }
     }
 
     // Keeps track of assiged new vertex indices, a midpoint between two already existing vertices.
-    std::size_t assigned[nve][nve];
+    boost::numeric::ublas::matrix<std::size_t> assigned(nve, nve);
     for (std::size_t i = 0; i != nve; ++i) {
       for (std::size_t j = 0; j != nve; ++j) {
-	assigned[i][j] = NA;
+	assigned(i,j) = NA;
       }
     }
 
@@ -315,7 +315,7 @@ namespace simploce {
 
       // Add at most three more vertices. Midpoint of an old edge serves as a new vertex.      
       std::size_t i01, i12, i20;
-      if ( !split[i0][i1] ) {
+      if ( !split(i0, i1) ) {
 	// New midpoint. Create new vertex and corresponding vertex index.
 	dist_vect_t d = r1 - r0;
 	position_t r01 = r0 + d / 2.0;
@@ -323,41 +323,41 @@ namespace simploce {
 	r01 *= radius/R;
 	vertices.push_back(Vertex::make(r01));
 	i01 = vertices.size() - 1;
-	split[i0][i1] = true;
-	split[i1][i0] = true;
-	assigned[i0][i1] = i01;
-	assigned[i1][i0] = i01;
+	split(i0, i1) = true;
+	split(i1,i0) = true;
+	assigned(i0, i1) = i01;
+	assigned(i1,i0) = i01;
       } else {
 	// Existing midpoint. Get its vertex index.
-	i01 = assigned[i0][i1];
+	i01 = assigned(i0,i1);
       }
-      if ( !split[i1][i2] ) {
+      if ( !split(i1,i2) ) {
 	dist_vect_t d = r2 - r1;
 	position_t r12 = r1 + d / 2.0;
 	length_t R = norm<length_t>(r12);
 	r12 *= radius/R;
 	vertices.push_back(Vertex::make(r12));
 	i12 = vertices.size() - 1;
-	split[i1][i2] = true;
-	split[i2][i1] = true;
-	assigned[i1][i2] = i12;
-	assigned[i2][i1] = i12;
+	split(i1,i2) = true;
+	split(i2,i1) = true;
+	assigned(i1,i2) = i12;
+	assigned(i2,i1) = i12;
       } else {
-	i12 = assigned[i1][i2];
+	i12 = assigned(i1, i2);
       }
-      if ( !split[i2][i0] ) {
+      if ( !split(i2,i0) ) {
 	dist_vect_t d = r0 - r2;
 	position_t r20 = r2 + d / 2.0;
 	length_t R = norm<length_t>(r20);
 	r20 *= radius/R;
 	vertices.push_back(Vertex::make(r20));
 	i20 = vertices.size() - 1;
-	split[i2][i0] = true;
-	split[i0][i2] = true;
-	assigned[i2][i0] = i20;
-	assigned[i0][i2] = i20;
+	split(i2,i0) = true;
+	split(i0,i2) = true;
+	assigned(i2,i0) = i20;
+	assigned(i0,i2) = i20;
       } else {
-	i20 = assigned[i2][i0];
+	i20 = assigned(i2,i0);
       }
 
       // Form 4 new triangles.
@@ -378,7 +378,7 @@ namespace simploce {
 
   static tri_srf_t mapToDottedSurface_(const tri_srf_t& srf, const std::vector<position_t>& points)
   {
-    std::clog << "Mapping onto dotted surface..." << std::endl;
+    std::clog << "Mapping spherical triangulated surface onto dotted surface..." << std::endl;
     
     std::vector<vertex_ptr_t> vertices = std::get<0>(srf);
     const std::vector<tri_t> tris = std::get<1>(srf);
@@ -400,7 +400,7 @@ namespace simploce {
     std::vector<MappingResult> results = wait_for_all<MappingResult>(futures);
 
     // Current thread.
-    const entity_range_t& range = ranges[ranges.size() -1];
+    const entity_range_t& range = ranges[ranges.size() - 1];
     MappingResult result = mapper_(vertices, range, points);
     results.push_back(result);
 
@@ -432,10 +432,10 @@ namespace simploce {
 
     // Edges created.
     std::size_t nve = vertices.size();
-    bool created[nve][nve];  // At most. The actual number is lower.
+    boost::numeric::ublas::matrix<bool> created(nve, nve); // At most. The actual number is lower.
     for (std::size_t i = 0; i != nve; ++i) {
       for (std::size_t j = 0; j != nve; ++j) {
-	created[i][j] = false;
+	created(i,j) = false;
       }
     }    
 
@@ -448,22 +448,22 @@ namespace simploce {
       Triangle triangle{vertices[i0], vertices[i1], vertices[i2]};
       triangles.push_back(triangle);
       
-      if ( !created[i0][i1] ) {
+      if ( !created(i0,i1) ) {
 	edges.push_back(Edge{vertices[i0], vertices[i1]});
-	created[i0][i1] = true;
-	created[i1][i0] = true;
+	created(i0,i1) = true;
+	created(i1,i0) = true;
       }
       
-      if ( !created[i1][i2] ) {
+      if ( !created(i1,i2) ) {
 	edges.push_back(Edge{vertices[i1], vertices[i2]});
-	created[i1][i2] = true;
-	created[i2][i1] = true;
+	created(i1,i2) = true;
+	created(i2,i1) = true;
       }
       
-      if ( !created[i2][i0] ) {
+      if ( !created(i2,i0) ) {
 	edges.push_back(Edge{vertices[i2], vertices[i0]});
-	created[i2][i0] = true;
-	created[i0][i2] = true;
+	created(i2,i0) = true;
+	created(i0,i2) = true;
       }
       
     }
@@ -478,14 +478,15 @@ namespace simploce {
   
 
   /**
-   * Returns a spherical triangulated surface.
+   * Returns a triangulated surface.
    * @param radius - Radius in nm.
-   * @param ntriangles - Desired number of triangles. Either 60, 240 or 960. Default is 60.
+   * @param ntriangles - Desired number of triangles. Default is 240.
+   * @param spherical - If true, the returned surface will be spherical. Default is false.
    */
-  static TriangulatedSurface
-  generateSphericalTriangulatedSurface_(const std::vector<position_t>& points,
-					const radius_t& radius,
-					std::size_t ntriangles = 60)
+  static TriangulatedSurface generateTriangulatedSurface_(const std::vector<position_t>& points,
+							  const radius_t& radius,
+							  std::size_t ntriangles = 240,
+							  bool spherical = false)
   {
     dodecahedron_t dodecahedron = makeDodecahedron_(radius);
     tri_srf_t srf = make60(radius, dodecahedron);
@@ -494,7 +495,9 @@ namespace simploce {
       srf = refine_(radius, srf);
       ntr = std::get<1>(srf).size();
     }
-    srf =  mapToDottedSurface_(srf, points);
+    if ( !spherical) {
+      srf =  mapToDottedSurface_(srf, points);
+    }
     return makeFrom_(srf);
   }
 
@@ -506,7 +509,8 @@ namespace simploce {
     }
   }
 
-  TriangulatedSurface SphereTriangulator::generate(const std::vector<position_t>& points) const
+  TriangulatedSurface SphereTriangulator::generate(const std::vector<position_t>& points,
+						   bool spherical) const
   {
     radius_t radius{0};
     for (position_t r : points) {
@@ -518,7 +522,7 @@ namespace simploce {
 
     // Add water radius (specified in conf.hpp).
     radius += R_WATER;
-    return generateSphericalTriangulatedSurface_(points, radius, ntriangles_);
+    return generateTriangulatedSurface_(points, radius, ntriangles_, spherical);
   }
 
   triangulator_ptr_t SphereTriangulator::make(std::size_t ntriangles)

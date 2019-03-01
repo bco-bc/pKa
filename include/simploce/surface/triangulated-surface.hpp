@@ -24,6 +24,11 @@ namespace simploce {
 			const std::vector<Edge>& edges);
 
     /**
+     * Ensure that normals point outward.
+     */
+    void orientOutward();
+
+    /**
      * Returns vertices.
      */
     const std::vector<vertex_ptr_t> vertices() const;

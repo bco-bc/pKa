@@ -3,6 +3,7 @@
 #include "simploce/util/cvector.hpp"
 #include "simploce/conf.hpp"
 #include <stdexcept>
+#include <algorithm>
 
 namespace simploce {
 
@@ -22,16 +23,13 @@ namespace simploce {
   normal_t Triangle::normal() const
   {
     static normal_t normal{};
-    static bool firstTime{false};
+    static bool firstTime{true};
     
     if ( firstTime ) {
       dist_vect_t r12 = v2_->position() - v1_->position();  // From 1 to 2.
-      dist_vect_t r13 = v3_->position() - v1_->position();  // From 1 to 2.
+      dist_vect_t r13 = v3_->position() - v1_->position();  // From 1 to 3.
       normal = cross(r12, r13);
       normal /= norm<real_t>(normal);
-      normal_t aveNormal = (v1_->normal() + v2_->normal() + v3_->normal() ) / 3.0;
-      real_t ip = inner<real_t>(normal,  aveNormal);
-      normal = ip < 0 ? -1.0 * normal : normal;
       firstTime = false;
     }
     return normal;
@@ -43,7 +41,7 @@ namespace simploce {
   area_t Triangle::area() const
   {
     static area_t area{0};
-    static bool firstTime{false};
+    static bool firstTime{true};
     
     if ( firstTime ) {
       real_t r12 = norm<real_t>(v1_->position() - v2_->position());
@@ -54,6 +52,16 @@ namespace simploce {
       firstTime = false;
     }
     return area;
+  }
+
+  std::tuple<vertex_ptr_t, vertex_ptr_t, vertex_ptr_t> Triangle::vertices()
+  {
+    return std::make_tuple(v1_, v2_, v3_);
+  }
+
+  void Triangle::swapTwoVertices()
+  {
+    std::swap(v2_, v3_);
   }
 
   std::ostream& Triangle::writeTo(std::ostream& stream) const

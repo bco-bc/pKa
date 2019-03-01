@@ -2,19 +2,23 @@
 #define PROTEIN_STRUCTURE_CONTENT_HANDLER_HPP
 
 #include "../types.hpp"
-#include "logger-content-handler.hpp"
+#include "base-content-handler.hpp"
 
 namespace simploce {
 
   /**
    * Generates a protein structures from chemical content.
    */
-  class ProteinStructureContentHandler : public LoggerContentHandler {
+  class ProteinStructureContentHandler : public BaseContentHandler {
   public:
 
     ProteinStructureContentHandler(const atom_catalog_ptr_t& atomCatalog);
 
     void start(const std::string &title) override;
+
+    void startAtomGroup(const std::string &atomGroupName) override;
+
+    void endAtomGroup() override;
 
     void startAtom(const std::string &atomName) override;
     

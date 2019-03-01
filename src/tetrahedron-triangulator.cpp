@@ -3,15 +3,19 @@
 #include "simploce/surface/triangle.hpp"
 #include "simploce/surface/edge.hpp"
 #include "simploce/surface/vertex.hpp"
+#include <stdexcept>
+#include <iostream>
 
 namespace simploce {
 
   TriangulatedSurface
-  TetrahedronTriangulator::generate(const std::vector<position_t>& points) const
+  TetrahedronTriangulator::generate(const std::vector<position_t>& points,
+				    bool spherical) const
   {
     if ( points.size() != 4) {
       throw std::domain_error("Tetrahedron: Can only be applied to 4 surface points.");
     }
+    std::clog << "WARNING: value of spherical has no effect." << std::endl;
 
     // 4 vertices.
     std::vector<vertex_ptr_t> vertices;

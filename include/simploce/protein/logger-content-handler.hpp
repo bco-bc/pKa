@@ -1,7 +1,7 @@
 #ifndef LOGGER_CONTENT_HANDLER_HPP
 #define LOGGER_CONTENT_HANDLER_HPP
 
-#include "content-handler.hpp"
+#include "base-content-handler.hpp"
 #include <iostream>
 
 namespace simploce {
@@ -10,7 +10,7 @@ namespace simploce {
    * Simply logs everything it receives. It keeps track of the number of atoms, atom groups,
    * molecules, and the total charge received.
    */
-  class LoggerContentHandler : public ContentHandler {
+  class LoggerContentHandler : public BaseContentHandler {
   public:
 
     /**
@@ -18,7 +18,7 @@ namespace simploce {
      */
     LoggerContentHandler();
 
-    virtual ~LoggerContentHandler() {}
+    virtual ~LoggerContentHandler();
 
     virtual void start(const std::string &title) override;
 

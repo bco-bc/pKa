@@ -3,7 +3,11 @@
 namespace simploce {
 
   LoggerContentHandler::LoggerContentHandler() :
-    ContentHandler{}, title_{}, nMolecules_{0}, nAtomGroups_{0}, nAtoms_{0}, totalCharge_{0}
+    BaseContentHandler{}, title_{}, nMolecules_{0}, nAtomGroups_{0}, nAtoms_{0}, totalCharge_{0}
+  {
+  }
+
+  LoggerContentHandler::~LoggerContentHandler()
   {
   }
   

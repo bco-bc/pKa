@@ -3,6 +3,7 @@
 
 #include "../types.hpp"
 #include <iostream>
+#include <tuple>
 
 namespace simploce {
 
@@ -46,6 +47,15 @@ namespace simploce {
     std::ostream& writeTo(std::ostream& stream) const;
 
   private:
+
+    friend class TriangulatedSurface;
+
+    std::tuple<vertex_ptr_t, vertex_ptr_t, vertex_ptr_t> vertices();
+
+    /**
+     * Swaps two vertices to ensure that the triangle's unit normal points outward.
+     */
+    void swapTwoVertices();
 
     vertex_ptr_t v1_;
     vertex_ptr_t v2_;
