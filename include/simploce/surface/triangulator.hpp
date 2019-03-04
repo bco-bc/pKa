@@ -16,10 +16,12 @@ namespace simploce {
      * Creates a triangulated surface from surface points.
      * @param points - Surface points. The origin must inside the surface.
      * @param spherical - If true, the triangulated surface will be spherical.
+     * @param radius - Radius of spherical surface. Only used if spherical is true.
      * @return Triangulated surface.
      */
     virtual TriangulatedSurface generate(const std::vector<position_t>& points,
-					 bool spherical = false) const = 0;
+					 bool spherical = false,
+					 const radius_t& radius = 1.0) const = 0;
   };
 }
 

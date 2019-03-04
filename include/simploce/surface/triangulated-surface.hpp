@@ -61,6 +61,8 @@ namespace simploce {
     static tri_surface_ptr_t make(std::istream& stream);
 
   private:
+
+    void finalize_();
     
     std::vector<vertex_ptr_t> vertices_;
     std::vector<Triangle> triangles_;

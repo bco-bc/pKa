@@ -26,7 +26,7 @@ namespace simploce {
       std::clog << "WARNING: The triangulated surface's Euler characteristic is not equal to 2. "
 		<< "Value is " << euler << "." << std::endl;
     }
-    this->orientOutward();
+    this->finalize_();
   }
 
   void TriangulatedSurface::orientOutward()
@@ -137,6 +137,14 @@ namespace simploce {
     }
     
     return std::make_shared<TriangulatedSurface>(vertices, triangles, edges);
+  }
+
+  void TriangulatedSurface::finalize_()
+  {
+    this->orientOutward();
+    for (Triangle& triangle : triangles_) {
+      triangle.properties();
+    }
   }
   
   std::ostream& TriangulatedSurface::writeTo(std::ostream& stream) const

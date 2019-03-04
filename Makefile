@@ -2,16 +2,19 @@
 PREFIX = /home/ajuffer
 
 # Location of sim-util header files.
-SIMUTIL = /home/ajuffer/PT-CGMD/sim-util
+SIMUTIL = /home/ajuffer/BCO/sim-util/include
 
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
         ../include/simploce/bem \
+        $(SIMUTIL)/simploce/util \
         ../include/simploce \
         ../src \
         ../tests \
-        ../apps 
+        ../apps
+
+TEMPLATES = lu.hpp
 
 INCLUDE = conf.hpp \
           factory.hpp surface.hpp triangulated-surface.hpp triangle.hpp edge.hpp vertex.hpp \
@@ -22,16 +25,17 @@ INCLUDE = conf.hpp \
           file-input-source.hpp logger-content-handler.hpp \
           protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp atom-group.hpp \
           protein-structure-content-handler.hpp \
+          flat-triangles-bem.hpp matrix-inversion.hpp
 
 SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
       tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
       pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
-      kernels.cpp base-content-handler.cpp atom-group.cpp
+      flat-triangles-bem.cpp base-content-handler.cpp atom-group.cpp matrix-inversion.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
-        test-kernels.cpp test-read-protein-structure.cpp
+        test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp
 
 APPS = s-tri-surface.cpp
 
@@ -47,7 +51,7 @@ LT = libtool
 LNAME = pka
 OPT = -ggdb
 STD = c++14
-INCLPATH = -I$(SIMUTIL)/include
+INCLPATH = -I$(SIMUTIL)
 OLIBS = -lsim-util
 #OLIBS = 
 CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread
@@ -57,6 +61,9 @@ LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostrea
 
 # All object files. Default.
 %.o : %.cpp $(INCLUDE)
+	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
+
+flat-triangles-bem.o : flat-triangles-bem.cpp $(INCLUDE) $(TEMPLATES)
 	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
 
 # All executables.

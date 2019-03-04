@@ -495,7 +495,7 @@ namespace simploce {
       srf = refine_(radius, srf);
       ntr = std::get<1>(srf).size();
     }
-    if ( !spherical) {
+    if ( !spherical ) {
       srf =  mapToDottedSurface_(srf, points);
     }
     return makeFrom_(srf);
@@ -510,19 +510,24 @@ namespace simploce {
   }
 
   TriangulatedSurface SphereTriangulator::generate(const std::vector<position_t>& points,
-						   bool spherical) const
+						   bool spherical,
+						   const radius_t& radius) const
   {
-    radius_t radius{0};
-    for (position_t r : points) {
-      radius_t R = norm<radius_t>(r);
-      if ( R > radius ) {
-	radius = R;
+    radius_t rad{0};
+    if ( !spherical)  {
+      for (position_t r : points) {
+	radius_t R = norm<radius_t>(r);
+	if ( R > rad ) {
+	  rad = R;
+	}
       }
+      
+      // Add water radius (specified in conf.hpp).
+      rad += R_WATER;
+    } else {
+      rad = radius;
     }
-
-    // Add water radius (specified in conf.hpp).
-    radius += R_WATER;
-    return generateTriangulatedSurface_(points, radius, ntriangles_, spherical);
+    return generateTriangulatedSurface_(points, rad, ntriangles_, spherical);
   }
 
   triangulator_ptr_t SphereTriangulator::make(std::size_t ntriangles)

@@ -3,6 +3,8 @@
 
 #include "simploce/util/cvector.hpp"
 #include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
 #include <utility>
 #include <memory>
 #include <tuple>
@@ -57,6 +59,11 @@ namespace simploce {
    * Ionic strength type.
    */
   using ionic_strength_t = real_t;
+
+  /**
+   * Electrostatic potential type.
+   */
+  using elec_pot_t = real_t;
 
   /**
    * Position type.

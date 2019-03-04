@@ -49,6 +49,11 @@ namespace simploce {
     return generateDottedSurface(atoms_);
   }
 
+  const std::vector<Atom>& ProteinStructure::atoms()
+  {
+    return atoms_;
+  }  
+
   std::ostream& ProteinStructure::writeTo(std::ostream& stream) const
   {
     stream << title_ << std::endl;

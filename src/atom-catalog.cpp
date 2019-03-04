@@ -15,7 +15,9 @@ namespace simploce {
   static radius_t R_O{R_WATER + 0.152};
   static radius_t R_N{R_WATER + 0.155};
   static radius_t R_S{R_WATER + 0.18};
+  static radius_t R_T{R_WATER + 0.10};  
   static charge_t zero{0.0};
+  static charge_t one{1.0};
 
   static void setup_(std::map<std::string, atom_spec_ptr_t>& specs)
   {
@@ -42,6 +44,12 @@ namespace simploce {
     std::string S = "S";
     atom_spec_ptr_t specS = AtomSpec::make(S, R_S, zero);
     p = std::make_pair(S, specS);
+    specs.insert(p);
+
+    // Test charge.
+    std::string T = "T";
+    atom_spec_ptr_t specT = AtomSpec::make(H, R_T, one);
+    p = std::make_pair(T, specT);
     specs.insert(p);
   }
 

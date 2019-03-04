@@ -57,10 +57,15 @@ namespace simploce {
      */
     void swapTwoVertices();
 
+    void properties();
+
     vertex_ptr_t v1_;
     vertex_ptr_t v2_;
     vertex_ptr_t v3_;
 
+    area_t area_;
+    position_t rmp_;
+    normal_t normal_;
   };
 
   /**

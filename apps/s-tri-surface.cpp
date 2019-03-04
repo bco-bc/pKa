@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
   std::string fnOutputTriangulatedSurface{"triangulated.srf"};
   std::size_t ntriangles{240};
   bool spherical{false};
+  radius_t radius{1.0};
   
   po::options_description usage("Usage");
   usage.add_options()
@@ -45,7 +46,9 @@ int main(int argc, char *argv[])
 
     ("pdb", "Assume PDB format for protein structure. This is the default.")
     ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
+    
     ("spherical", "Create a spherical triangulated surface.")
+    ("radius", po::value<radius_t>(&radius), "Radius of spherical surface.")
 
     ("number-of-triangles", po::value<std::size_t>(&ntriangles),
      "Requested number of triangles. Default is 240.")
@@ -83,6 +86,9 @@ int main(int argc, char *argv[])
   }
   if ( vm.count("spherical") ) {
     spherical = true;
+  }
+  if ( vm.count("radius") ) {
+    radius = vm["radius"].as<radius_t>();
   }
   if ( vm.count("number-of-triangles") ) {
     ntriangles = vm["number-of-triangles"].as<std::size_t>();
@@ -144,7 +150,7 @@ int main(int argc, char *argv[])
 
   // Triangulate.
   triangulator_ptr_t triangulator = Factory::triangulator(ntriangles);
-  TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator, spherical);
+  TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator, spherical, radius);
   
   // Write surface to output file.
   openOutputFile(ostream, fnOutputTriangulatedSurface);

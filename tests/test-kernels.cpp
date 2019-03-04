@@ -1,13 +1,13 @@
-#include "simploce/bem/kernels.hpp"
+#include "simploce/bem/flat-triangles-bem.hpp"
 #include "simploce/surface/triangulated-surface.hpp"
 #include "simploce/util/util.hpp"
-#include <boost/numeric/ublas/io.hpp>
 #include <stdexcept>
 #include <string>
 #include <iostream>
 #include <fstream>
 
 using namespace simploce;
+using bem_t = FlatTrianglesBEM;
 
 int main(int argc, char *argv[])
 {
@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
   ionic_strength_t I{0.0};
 
   matrix_t L;  
-  Kernels kernels(epsI, epsO, I);
-  kernels.L0(*surface, L);
+  bem_t bem(epsI, epsO, I);
+  bem.kernels(*surface, L);
 
   std::cout << L << std::endl;
 

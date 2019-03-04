@@ -10,12 +10,14 @@ namespace simploce {
 
   TriangulatedSurface
   TetrahedronTriangulator::generate(const std::vector<position_t>& points,
-				    bool spherical) const
+				    bool spherical,
+				    const radius_t& radius) const
   {
     if ( points.size() != 4) {
       throw std::domain_error("Tetrahedron: Can only be applied to 4 surface points.");
     }
-    std::clog << "WARNING: value of spherical has no effect." << std::endl;
+    std::clog << "WARNING: value of 'spherical' is ignored." << std::endl;
+    std::clog << "WARNING: value of 'radius' is ignored." << std::endl;
 
     // 4 vertices.
     std::vector<vertex_ptr_t> vertices;

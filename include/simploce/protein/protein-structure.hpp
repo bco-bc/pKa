@@ -38,6 +38,11 @@ namespace simploce {
     Surface dottedSurface() const;
 
     /**
+     * Return atoms.
+     */
+    const std::vector<Atom>& atoms();
+
+    /**
      * Writes this protein structure to output stream.
      * @param stream - Output stream.
      * @return Output stream.

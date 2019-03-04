@@ -31,10 +31,12 @@ namespace simploce {
      * Triangulate this surface.
      * @param triangulator - Triangulation algorithme.
      * @param spherical - If true, the triangulated surface will be spherical.
+     * @param radius - Radius of spherical surface. Only used if spherical is true.
      * @return Triangulated surface.
      */
     TriangulatedSurface triangulate(const triangulator_ptr_t& triangulator,
-				    bool spherical = false);
+				    bool spherical = false,
+				    const radius_t& radius = 1.0);
 
     /**
      * Returns surface area.

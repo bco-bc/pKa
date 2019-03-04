@@ -10,11 +10,9 @@ namespace simploce {
    */
   struct TetrahedronTriangulator : public Triangulator {    
 
-    /**
-     * @param points - Surface points. Its size must be exactly 4.
-     */
     TriangulatedSurface generate(const std::vector<position_t>& points,
-				 bool spherical = false) const;
+				 bool spherical = false,
+				 const radius_t& radius = 1.0) const;
 
     /**
      * Returns triangulator.
