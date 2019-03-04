@@ -2,7 +2,7 @@
 PREFIX = /home/ajuffer
 
 # Location of sim-util header files.
-SIMUTIL = /home/ajuffer/BCO/sim-util/include
+SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 
 
 VPATH = ../include/simploce/surface \
@@ -35,7 +35,7 @@ SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp ver
       flat-triangles-bem.cpp base-content-handler.cpp atom-group.cpp matrix-inversion.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
-        test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp
+        test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp test-lu.cpp
 
 APPS = s-tri-surface.cpp
 
@@ -67,7 +67,7 @@ flat-triangles-bem.o : flat-triangles-bem.cpp $(INCLUDE) $(TEMPLATES)
 	$(LT) --mode=compile $(CC) -c $(CFLAGS) $< -o $@
 
 # All executables.
-% : %.cpp $(INCLUDE)
+% : %.cpp $(INCLUDE) $(TEMPLATES)
 	$(LT) --mode=link $(CC) $(LDFLAGS) $(LIBS) $< -o $@ -rpath $(PREFIX)/bin
 
 lib : $(SOBJ)

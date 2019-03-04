@@ -190,10 +190,13 @@ namespace simploce {
   
   void FlatTrianglesBEM::solve(const matrix_t& S, const vector_t& b, vector_t& x)
   {
-    std::size_t ndim = b.size();
+    // Copy rhs into x.
+    x = b;
+    
+    std::size_t ndim = x.size();
     backSubstitution<real_t,
 		     boost::numeric::ublas::matrix,
-		     boost::numeric::ublas::vector>(S, ndim, indx_, b, x);
+		     boost::numeric::ublas::vector>(S, ndim, indx_, x);
     /*
       Assume S is inverse matrix.
     // Number of collocation points.
