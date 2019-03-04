@@ -166,14 +166,12 @@ namespace simploce {
     } else {
       L0_(surface, epsI_, epsO_, S);
     }
-    std::clog << "Kernel(s) computed." << std::endl;
-    std::size_t ntr = surface.triangles().size();
+    
+    std::size_t ndim = surface.triangles().size();
     indx_.clear();
-    std::clog << "Performing LU decomposition...";
     luDecomposition<real_t,
 		    boost::numeric::ublas::matrix,
-		    boost::numeric::ublas::vector>(S, ntr, indx_);
-    std::clog << "Done." << std::endl;
+		    boost::numeric::ublas::vector>(S, ndim, indx_);
   }
 
   void FlatTrianglesBEM::rhs(const std::vector<Atom>& atoms,
@@ -188,32 +186,12 @@ namespace simploce {
   }
 
   
-  void FlatTrianglesBEM::solve(const matrix_t& S, const vector_t& b, vector_t& x)
+  void FlatTrianglesBEM::solve(const matrix_t& S, vector_t& b)
   {
-    // Copy rhs into x.
-    x = b;
-    
-    std::size_t ndim = x.size();
+    std::size_t ndim = b.size();
     backSubstitution<real_t,
 		     boost::numeric::ublas::matrix,
-		     boost::numeric::ublas::vector>(S, ndim, indx_, x);
-    /*
-      Assume S is inverse matrix.
-    // Number of collocation points.
-    std::size_t ncp = b.size();
-    
-    x.clear();
-    x.resize(ncp, false);
-    for (std::size_t i = 0; i != ncp; ++i) {
-      x(i) = 0.0;
-    }
-
-    for (std::size_t i = 0; i != ncp; ++i) {
-      for (std::size_t j = 0; j != ncp; ++j) {
-	x(i) += S(i, j) * b(j);
-      }
-    }
-    */
+		     boost::numeric::ublas::vector>(S, ndim, indx_, b);
   }
 
   void FlatTrianglesBEM::integrate(const TriangulatedSurface& surface,
@@ -223,9 +201,11 @@ namespace simploce {
   {
     const real_t ratio = epsO_/epsI_;
     const real_t factor = ratio - 1.0;
-    
-    const std::vector<Triangle>& triangles = surface.triangles();
+
+    potentials.clear();
     potentials.resize(positions.size(), 0.0);
+
+    const std::vector<Triangle>& triangles = surface.triangles();
     for (std::size_t i = 0; i != positions.size(); ++i) {
       const position_t& ri = positions[i];
       for (std::size_t j = 0; j != triangles.size(); ++j) {

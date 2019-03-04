@@ -20,9 +20,9 @@ namespace simploce {
     /**
      * Computes kernels.
      * @param surface - Triangulated surface.
-     * @param A - Upon return, holds kernel values.
+     * @param S - Upon return, holds kernel values.
      */
-    virtual void kernels(const TriangulatedSurface& surface, matrix_t& A) = 0;
+    virtual void kernels(const TriangulatedSurface& surface, matrix_t& S) = 0;
 
     /**
      * Returns right-hand-size b of the matrix equation Ax=b.
@@ -36,11 +36,10 @@ namespace simploce {
 
     /**
      * Returns solution x of Ax=b.
-     * @param A - Kernel values.
-     * @param b - Right hand side of Ax=b.
-     * @param x - Upon return, holds solution.
+     * @param S - Kernel values.
+     * @param b - Right hand side of Ax=b. Upon return, holds solution x.
      */
-    virtual void solve(const matrix_t& A, const vector_t& b, vector_t& x) = 0;
+    virtual void solve(const matrix_t& S, vector_t& b) = 0;
 
     /**
      * Given the solution x of Ax=b, this methods returns the reaction electrostatic 
@@ -48,7 +47,7 @@ namespace simploce {
      * @param surface - Triangulated surface.
      * @param x - Solution of Ax=b
      * @param positions - Coordinates of positions at which the potential is to be calculated.
-     * @param potentials - Upon return, holds electrostatic potentials at positions.
+     * @param potentials - Upon return, holds electrostatic reaction potentials at positions.
      */
     virtual void integrate(const TriangulatedSurface& surface,
 			   const vector_t& x,

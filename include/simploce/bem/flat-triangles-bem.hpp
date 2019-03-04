@@ -25,24 +25,13 @@ namespace simploce {
 		     const permittivity_t& epsO,
 		     const ionic_strength_t& I);
 
-    /**
-     * Computes kernels. Returned is an inverse matrix S, such that Sb = x and A = S^-1.
-     * @param surface - Triangulated surface.
-     * @param S - Upon return, holds values for S.
-     */
     void kernels(const TriangulatedSurface& surface, matrix_t& S);
 
     void rhs(const std::vector<Atom>& atoms,
 	     const TriangulatedSurface& surface,
 	     vector_t& b) override;
 
-    /**
-     * Returns solution x of Ax=b or Sb = x with A = S^-1.
-     * @param S - Kernel values.
-     * @param b - Right hand side of Ax=b.
-     * @param x - Upon return, holds solution.
-     */
-    void solve(const matrix_t& S, const vector_t& b, vector_t& x) override;
+    void solve(const matrix_t& S, vector_t& b) override;
 
     void integrate(const TriangulatedSurface& surface,
 		   const vector_t& x,
