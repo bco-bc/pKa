@@ -24,10 +24,6 @@ int main(int argc, char *argv[])
   permittivity_t epsO{80.0};
   ionic_strength_t I{0.0};
 
-  matrix_t L;  
   bem_t bem(epsI, epsO, I);
-  bem.kernels(*surface, L);
-
-  std::cout << L << std::endl;
-
+  bem.kernels(*surface);
 }

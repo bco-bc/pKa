@@ -2,9 +2,10 @@
 #define TYPES_HPP
 
 #include "simploce/util/cvector.hpp"
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/io.hpp>
+//#include <boost/numeric/ublas/matrix.hpp>
+//##include <boost/numeric/ublas/vector.hpp>
+//##include <boost/numeric/ublas/io.hpp>
+#include <Eigen/Dense>
 #include <utility>
 #include <memory>
 #include <tuple>
@@ -19,12 +20,16 @@ namespace simploce {
   /**
    * Matrix type for linear algebra.
    */
-  using matrix_t = boost::numeric::ublas::matrix<real_t>;
+  //using matrix_t = boost::numeric::ublas::matrix<real_t>;
+  typedef Eigen::Matrix<real_t, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
 
   /**
    * Vector type for linear algebra.
    */
-  using vector_t = boost::numeric::ublas::vector<real_t>;
+  //using vector_t = boost::numeric::ublas::vector<real_t>;
+  typedef Eigen::Matrix<real_t, Eigen::Dynamic, 1> rvector_t;
+  typedef Eigen::Matrix<int,  Eigen::Dynamic, 1> ivector_t;
+  
   /**
    * Length type.
    */

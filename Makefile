@@ -4,6 +4,11 @@ PREFIX = /home/ajuffer
 # Location of sim-util header files.
 SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 
+# Location of Eigen header files
+EIGEN = /usr/include/eigen3
+
+# Location of MKL header files.
+MKL = /localdisk/intel/mkl/include
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -25,17 +30,20 @@ INCLUDE = conf.hpp \
           file-input-source.hpp logger-content-handler.hpp \
           protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp atom-group.hpp \
           protein-structure-content-handler.hpp \
-          flat-triangles-bem.hpp matrix-inversion.hpp
+          flat-triangles-bem.hpp
+#matrix-inversion.hpp
 
 SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
       tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
       pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
-      flat-triangles-bem.cpp base-content-handler.cpp atom-group.cpp matrix-inversion.cpp
+      flat-triangles-bem.cpp base-content-handler.cpp atom-group.cpp
+#matrix-inversion.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
-        test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp test-lu.cpp
+        test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp \
+        test-lu.cpp
 
 APPS = s-tri-surface.cpp
 
@@ -51,10 +59,10 @@ LT = libtool
 LNAME = pka
 OPT = -ggdb
 STD = c++14
-INCLPATH = -I$(SIMUTIL)
-OLIBS = -lsim-util
-#OLIBS = 
-CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread
+INCLPATH = -I$(SIMUTIL) -I$(EIGEN) -I$(MKL)
+OLIBS = -lsim-util -llapack -lblas -liomp5
+#OLIBS =
+CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread -D EIGEN_USE_LAPACKE
 LDFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -L. -L$(PREFIX)/lib -pthread
 LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz
 #-lz for zlib

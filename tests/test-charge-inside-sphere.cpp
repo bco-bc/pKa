@@ -32,9 +32,8 @@ int main(int argc, char *argv[])
   permittivity_t epsO{78.5};
   ionic_strength_t I{0.0};
 
-  matrix_t S{};  
   bem_t bem(epsI, epsO, I);
-  bem.kernels(*surface, S);
+  bem.kernels(*surface);
   //std::clog << S << std::endl;
   //std::clog << std::endl;
 
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
 
   std::size_t N = 200;
   real_t dr = radius / N;
-  vector_t b{};
+  rvector_t b{};
   std::vector<Atom> atoms;
   std::vector<position_t> positions{};
   std::vector<elec_pot_t> potentials{};
@@ -51,13 +50,14 @@ int main(int argc, char *argv[])
     positions.clear();
     atoms.clear();
     position_t r{0.0, 0.0, i * dr};
+    //position_t r{0.0, 0.0, 1.0};
     positions.push_back(r);
     atoms.push_back(Atom{"T", r, spec});
     bem.rhs(atoms, *surface, b);
     //    std::clog << "RHS:" << std::endl;
     //std::clog << b << std::endl;
     //std::clog << std::endl;
-    bem.solve(S, b);
+    bem.solve(b);
     //std::clog << "Solution:" << std::endl;
     //std::clog << b << std::endl;
     //std::clog << std::endl;

@@ -16,7 +16,7 @@
 
 namespace simploce {
   
-  using namespace boost::numeric::ublas;  
+  //using namespace boost::numeric::ublas;  
 
   const real_t FOUR_PI = 4.0 * MathConstants<real_t>::PI;
   const real_t E0 = MUUnits<real_t>::E0;
@@ -61,8 +61,8 @@ namespace simploce {
     const real_t factor = 2.0 * (ratio - 1.0) / (1.0 + ratio);
 
     // Initialize kernel. Number of collocation points corresponds to the number of triangles.
-    std::size_t ntr = triangles.size();    
-    L.resize(ntr, ntr, false);
+    std::size_t ntr = triangles.size();
+    L = matrix_t(ntr, ntr);
     for (std::size_t i = 0; i != ntr; ++i) {
       for ( std::size_t j = 0; j != ntr; ++j) {
 	L(i,j) = 0.0;
@@ -108,7 +108,7 @@ namespace simploce {
 		    const TriangulatedSurface& surface,
 		    const permittivity_t& epsI,
 		    const permittivity_t& epsO,
-		    vector_t& b)
+		    rvector_t& b)
   {
     const real_t ratio = epsO/epsI;
     const real_t factor = 2.0 / ((1.0 + ratio) * epsI * E0 * FOUR_PI);
@@ -116,8 +116,7 @@ namespace simploce {
     const std::vector<Triangle>& triangles = surface.triangles();
     std::size_t ntr = triangles.size();
     
-    b.clear();
-    b.resize(ntr, false);
+    b = rvector_t(ntr);
     for (std::size_t i = 0; i != ntr; ++i) {
       b(i) = 0.0;
     }
@@ -142,14 +141,14 @@ namespace simploce {
 		   const permittivity_t& epsI,
 		   const permittivity_t& epsO,
 		   const ionic_strength_t& I,
-		   vector_t& rhs)
+		   rvector_t& rhs)
   {
   }
 
   FlatTrianglesBEM::FlatTrianglesBEM(const permittivity_t& epsI,
 				     const permittivity_t& epsO,
 				     const ionic_strength_t& I) :
-    BEM(), epsI_(epsI), epsO_(epsO), I_(I), indx_{}
+    BEM(), epsI_(epsI), epsO_(epsO), I_(I), indx_{}, luQR_{}
   {
     if ( epsI_ <= 0.0 || epsO_ <= 0.0 ) {
       throw std::domain_error("BEM: Permittivities must be non-negative numbers.");
@@ -159,24 +158,29 @@ namespace simploce {
     }
   }
 
-  void FlatTrianglesBEM::kernels(const TriangulatedSurface& surface, matrix_t& S)
-  {    
+  void FlatTrianglesBEM::kernels(const TriangulatedSurface& surface)
+  {
+    matrix_t S;
     if ( I_ > 0.0 ) {
       KLMN_(surface, epsI_, epsO_, S);
     } else {
       L0_(surface, epsI_, epsO_, S);
     }
-    
+
+    /*
     std::size_t ndim = surface.triangles().size();
-    indx_.clear();
+    //indx_.clear();
+    indx_ = ivector_t(ndim);
     luDecomposition<real_t,
 		    boost::numeric::ublas::matrix,
 		    boost::numeric::ublas::vector>(S, ndim, indx_);
+    */
+    luQR_ = S.colPivHouseholderQr();    
   }
 
   void FlatTrianglesBEM::rhs(const std::vector<Atom>& atoms,
 			     const TriangulatedSurface& surface,
-			     vector_t& b)
+			     rvector_t& b)
   {
     if ( I_ > 0.0 ) {
       RHS_(atoms, surface, epsI_, epsO_, I_, b);
@@ -186,16 +190,19 @@ namespace simploce {
   }
 
   
-  void FlatTrianglesBEM::solve(const matrix_t& S, vector_t& b)
+  void FlatTrianglesBEM::solve(rvector_t& b)
   {
+    /*
     std::size_t ndim = b.size();
     backSubstitution<real_t,
 		     boost::numeric::ublas::matrix,
 		     boost::numeric::ublas::vector>(S, ndim, indx_, b);
+    */
+    b = rvector_t{luQR_.solve(b)};
   }
 
   void FlatTrianglesBEM::integrate(const TriangulatedSurface& surface,
-				   const vector_t& x,
+				   const rvector_t& x,
 				   const std::vector<position_t> positions,
 				   std::vector<elec_pot_t>& potentials)
   {

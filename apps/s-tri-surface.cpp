@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
   std::string fnOutputTriangulatedSurface{"triangulated.srf"};
   std::size_t ntriangles{240};
   bool spherical{false};
-  radius_t radius{1.0};
+  radius_t radius{2.0};
   
   po::options_description usage("Usage");
   usage.add_options()
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
     
     ("spherical", "Create a spherical triangulated surface.")
-    ("radius", po::value<radius_t>(&radius), "Radius of spherical surface.")
+    ("radius", po::value<radius_t>(&radius), "Radius of spherical surface. Default is 2.0 nm.")
 
     ("number-of-triangles", po::value<std::size_t>(&ntriangles),
      "Requested number of triangles. Default is 240.")

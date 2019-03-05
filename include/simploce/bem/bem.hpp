@@ -18,28 +18,26 @@ namespace simploce {
     ~BEM() {}
 
     /**
-     * Computes kernels.
+     * Computes kernels. For the same surface, one calls this method only once.
      * @param surface - Triangulated surface.
-     * @param S - Upon return, holds kernel values.
      */
-    virtual void kernels(const TriangulatedSurface& surface, matrix_t& S) = 0;
+    virtual void kernels(const TriangulatedSurface& surface) = 0;
 
     /**
      * Returns right-hand-size b of the matrix equation Ax=b.
      * @param atoms - Atoms, some of which should be charged.
      * @param surface -  Triangulated surface.
-     * @param rhs - Upon return, holds the right-hand-size values.
+     * @param b - Upon return, holds the right-hand-size values.
      */
     virtual void rhs(const std::vector<Atom>& atoms,
 		     const TriangulatedSurface& surface,
-		     vector_t& b) = 0;
+		     rvector_t& b) = 0;
 
     /**
      * Returns solution x of Ax=b.
-     * @param S - Kernel values.
      * @param b - Right hand side of Ax=b. Upon return, holds solution x.
      */
-    virtual void solve(const matrix_t& S, vector_t& b) = 0;
+    virtual void solve(rvector_t& b) = 0;
 
     /**
      * Given the solution x of Ax=b, this methods returns the reaction electrostatic 
@@ -50,7 +48,7 @@ namespace simploce {
      * @param potentials - Upon return, holds electrostatic reaction potentials at positions.
      */
     virtual void integrate(const TriangulatedSurface& surface,
-			   const vector_t& x,
+			   const rvector_t& x,
 			   const std::vector<position_t> positions,
 			   std::vector<elec_pot_t>& potentials) = 0;
 

@@ -25,16 +25,16 @@ namespace simploce {
 		     const permittivity_t& epsO,
 		     const ionic_strength_t& I);
 
-    void kernels(const TriangulatedSurface& surface, matrix_t& S);
+    void kernels(const TriangulatedSurface& surface);
 
     void rhs(const std::vector<Atom>& atoms,
 	     const TriangulatedSurface& surface,
-	     vector_t& b) override;
+	     rvector_t& b) override;
 
-    void solve(const matrix_t& S, vector_t& b) override;
+    void solve(rvector_t& b) override;
 
     void integrate(const TriangulatedSurface& surface,
-		   const vector_t& x,
+		   const rvector_t& x,
 		   const std::vector<position_t> positions,
 		   std::vector<elec_pot_t>& potentials) override;
     
@@ -45,7 +45,8 @@ namespace simploce {
     ionic_strength_t I_;
 
     // Pivot information.
-    boost::numeric::ublas::vector<std::size_t> indx_;
+    ivector_t indx_;
+    Eigen::ColPivHouseholderQR<matrix_t> luQR_;
   };
 
 }
