@@ -398,7 +398,7 @@ namespace simploce {
     // Get the coordinates
     int index = 4; // Assume chain identifier, code for insertion of residues and alternate
                    // location indicator are not there.
-    real_t x, y, z, fraction, eps = 1.0e-07;
+    real_t x{0}, y{0}, z{0}, fraction{0}, eps = 1.0e-07;
     bool success = false;
     do {
       try {

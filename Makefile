@@ -8,7 +8,8 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 EIGEN = /usr/include/eigen3
 
 # Location of MKL header files.
-MKL = /localdisk/intel/mkl/include
+#MKLROOT = /localdisk/intel/mkl
+MKLROOT = /home/juffer/intel/mkl
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -21,7 +22,7 @@ VPATH = ../include/simploce/surface \
 
 TEMPLATES = lu.hpp
 
-INCLUDE = conf.hpp \
+INCLUDE = conf.hpp types.hpp \
           factory.hpp surface.hpp triangulated-surface.hpp triangle.hpp edge.hpp vertex.hpp \
           triangulator.hpp sphere-triangulator.hpp \
           tetrahedron-triangulator.hpp nsc.hpp dotted-surface-generator.hpp \
@@ -58,13 +59,17 @@ CC = g++
 LT = libtool
 LNAME = pka
 OPT = -ggdb
+#OPT = -O3
 STD = c++14
-INCLPATH = -I$(SIMUTIL) -I$(EIGEN) -I$(MKL)
-OLIBS = -lsim-util -llapack -lblas -liomp5
-#OLIBS =
-CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread -D EIGEN_USE_LAPACKE
-LDFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -L. -L$(PREFIX)/lib -pthread
-LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz
+INCLPATH = -I$(SIMUTIL) -I$(EIGEN) -I$(MKLROOT)/include
+OLIBS = -lsim-util
+#OLIBS = -lsim-util
+CFLAGS_EIGEN = -m64 -DEIGEN_USE_MKL_ALL 
+CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread $(CFLAGS_EIGEN)
+LDFLAGS_EIGEN = -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed
+LDFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -L. -L$(PREFIX)/lib -pthread $(LDFLAGS_EIGEN)
+LIBS_EIGEN = -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -ldl -liomp5 -lblas -llapacke
+LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz $(LIBS_EIGEN)
 #-lz for zlib
 
 # All object files. Default.

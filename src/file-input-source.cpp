@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <memory>
+#include <iterator>
 
 namespace simploce {
   
