@@ -13,12 +13,15 @@
 #include <thread>
 #include <stdexcept>
 #include <iostream>
+#include <utility>
+#include <tuple>
 
 namespace simploce {
   
   //using namespace boost::numeric::ublas;  
 
   const real_t FOUR_PI = 4.0 * MathConstants<real_t>::PI;
+  const real_t E = MathConstants<real_t>::E;
   const real_t E0 = MUUnits<real_t>::E0;
 
   struct KernelResult {
@@ -30,28 +33,141 @@ namespace simploce {
   using entity_range_t = EntityRange<Triangle>;
 
   /**
-   * This corresponds to dF(r; s)/dn * area, with r located on the triangle, 
-   * F(r;s)=1/(4*pi*|r-s|), and area is the area of the triangle.
-   * @see Equation (2.3) in reference.
+   *  Returns F(r;s) = 1/(4*pi*|r-s|)
    */
-  static real_t dFdn_(const position_t& s, const Triangle& triangle)
+  static std::tuple<real_t, length_t> F_(const position_t r, const position_t s)
   {
-    position_t r = triangle.midpoint();
-    normal_t n = triangle.normal();
-    dist_vect_t disv = r - s;
-    real_t imp = inner<real_t>(disv, n);
-    length_t R = norm<real_t>(disv);
-    return -imp / (FOUR_PI * R * R * R);
+    length_t R = norm<length_t>(r - s);
+    real_t F = 1.0 / (FOUR_PI * R);
+    return std::make_tuple(F, R);
   }
 
   /**
-   * Zero ionic strength. Collocation points are vertices. Integration over surface 
-   * assumes the kernel to be constant across a triangle ("midpoint rule").
+   * Returns P(r;s) = exp(-ka * |r-s|)) * F(r;s)
    */
-  static void L0_(const TriangulatedSurface& surface,
-		  const permittivity_t& epsI,
-		  const permittivity_t& epsO,
-		  matrix_t& L)
+  static real_t P_(const position_t r, const position_t s, const real_t& ka)
+  {
+    auto pair = F_(r,s);
+    real_t F = std::get<0>(pair);
+    real_t R = std::get<1>(pair);
+    real_t kaR = ka * R;
+    real_t exp = std::pow(E, -kaR);
+    return exp * F;
+  }
+
+  /**
+   * dF(r; s)/dn, where F(r;s) = 1/(4*pi*|r-s|), where n is the unit normal vector at r.
+   * @return dFdn and R=|r-s|.
+   */
+  static std::tuple<real_t, length_t> dFdn_(const position& r,
+					    const normal_t& n,
+					    const position_t& s)
+  {
+    dist_vect_t disv = r - s;
+    real_t imp = inner<real_t>(ns, disv);
+    length_t R = norm<real_t>(rs);
+    real_t dFdn = -imp / (FOUR_PI * R * R * R);
+    return std::make_tuple(dFdn, R);
+  }
+
+  /**
+   * dF(r; s)/dns, where F(r;s) = 1/(4*pi*|r-s|), where ns is the unit vector at s.
+   * @return dFdns and |r-s|.
+   */
+  static std::tuple<real_t, length_t> dFdns_(const position& r,
+					     const position_t& s,
+					     const normal_t& ns)
+  {
+    dist_vect_t disv = r - s;
+    real_t imp = inner<real_t>(ns, disv);
+    length_t R = norm<real_t>(disv);
+    real_t dFdns = imp / (FOUR_PI * R * R * R);
+    return std::make_tuple(dFdns, R);
+  }
+
+  /**
+   * dF^2/dnsdn, where F(r;s) = 1/(4*pi*|r-s|), n is the unit normal vector at r, and 
+   * ns is the unit normal vector at s.
+   * @return dF2dnsdn, |r-s|, n*(r-s)/|r-s|, ns*(r-s)/|r-s|.
+   */
+  static std::tuple<real_t, length_t, real_t, real_t> dF2dnsdn_(const position_t& r,
+								const normal_t& n,
+								const position_t& s,
+								const normal_t& ns)
+  {
+    dist_vect_t disv = r - s;
+    length_t R = norm<real_t>(disv);
+    real_t imp_nns = inner<real_t>(n, ns);
+    real_t imp_n_R = inner<real_t>(n, disv) / R;
+    real_t imp_ns_R = inner<real_t>(ns, disv) / R;
+    real_t dF2dndns = (imp_nns - 3.0 * imp_n_R * imp_ns_R) / (FOUR_PI * R * R * R);
+    return std::make_tuple(dF2dndns, R, imp_n_R, imp_ns_R);
+  }
+
+  /**
+   * dP(r; s)/dn, where P(r;s) = exp(-ka * |r-s|)) * F(r;s), where n is the unit vector at r.
+   */
+  static real_t dPdn_(const position_t& r,
+		      const position_t& n,
+		      const position_t& s,
+		      const real_t& ka)
+  {
+    auto pair = dFdn_(r, n, s);
+    real_t dFdn = std::get<0>(pair);
+    length_t R = std::get<1>(pair);
+    real_t kaR = ka * R;
+    real_t exp = std::pow(E, -kaR);
+    return (1.0 + kaR) * exp * dFdn;
+  }
+
+  /**
+   * dP(r; s)/dns, where P(r;s) = exp(-ka * |r-s|)) * F(r;s), r is located on the triangle, and 
+   * ns is the unit normal vector at s.
+   */
+  static real_t dPdns_(const position& r,
+		       const position_t& s,
+		       const normal_t& ns,
+		       const real_t& ka)
+  {
+    auto pair = dFdns_(r, s, ns);
+    real_t dFdns = std::get<0>(pair);
+    length_t R = std::get<1>(pair);
+    real_t kaR = ka * R;
+    real_t exp = std::pow(E, -kaR);
+    return (1.0 + kaR) * exp * dFdns;
+  }
+
+  /**
+   * dP^2/dnsdn, where P(r;s) = exp(-ka * |r-s|) * F(r;s), n is the unit normal vector at r, and 
+   * ns is the unit normal vector at s
+   */
+  static real_t d2Pdnsdn_(const position_t& r,
+			  const normal_t& n,
+			  const position_t& s,
+			  const normal_t& ns
+			  const real_t& ka)
+  {
+    auto tuple =  dF2dnsdn_(r, n, s, ns);
+    real_t dF2dnsdn = std::get<0>(tuple);
+    real_t R = std::get<1>(tuple);
+    real_t imp_n_R = std::get<2>(tuple);
+    real_t imp_ns_R = std::get<3>(tuple);
+    real_t kaR = ka * R;
+    real_t exp = std::pow(E, -kaR);
+    real_t ka2 = ka * ka;
+    return (1.0 + kaR) * exp * dF2dnsdn - ka2 * exp * imp_n_R * imp_ns_R /(FOUR_PI * R);
+  }
+
+  /**
+   * Calculates L1 for zero ionic strength. Collocation points are vertices. 
+   * Integration over surface assumes the kernel and potential to be constant across a 
+   * triangle.
+   * 
+   */
+  static void L1_0_(const TriangulatedSurface& surface,
+		    const permittivity_t& epsI,
+		    const permittivity_t& epsO,
+		    matrix_t& L)
   {
     const std::vector<Triangle>& triangles = surface.triangles();
     const std::vector<vertex_ptr_t>& vertices = surface. vertices();
@@ -76,8 +192,11 @@ namespace simploce {
       
       for (std::size_t j = 0; j < i; ++j) {
 	const Triangle& tj = triangles[j];
+	position_t r = tj.position();
+	normal_t n = tj.normal();
 	area_t area = tj.area();
-	real_t lij = factor * dFdn_(r0, tj) * area;
+	real_t dFdn = std::get<0>(dFdn_(r, n, r0));
+	real_t lij = factor * dFdn * area;
 	L(i,j) -= lij;
       }
 
@@ -86,18 +205,25 @@ namespace simploce {
 
       for (std::size_t j = i+1; j < ntr; ++j) {
 	const Triangle& tj = triangles[j];
+	position_t r = tj.position();
+	normal_t n = tj.normal();
 	area_t area = tj.area();
-	real_t lij = factor * dFdn_(r0, tj) * area;
+	real_t dFdn = std::get<0>(dFdn_(r0, tj));
+	real_t lij = factor * dFdn * area;
 	L(i,j) -= lij;
       }
       
     }
   }
 
-  static void KLMN_(const TriangulatedSurface& surface,
-		    const permittivity_t& epsI,
-		    const permittivity_t& epsO,
-		    matrix_t& L)
+  /**
+   * Computes kernels L1, L2, L3, and L4 for given ionic strength.
+   */
+  static void L1234_(const TriangulatedSurface& surface,
+		     const permittivity_t& epsI,
+		     const permittivity_t& epsO,
+		     const real_t& ka,
+		     matrix_t& L)
   {
   }
 
@@ -141,14 +267,40 @@ namespace simploce {
 		   const permittivity_t& epsI,
 		   const permittivity_t& epsO,
 		   const ionic_strength_t& I,
-		   rvector_t& rhs)
+		   rvector_t& b)
   {
+    const real_t ratio = epsO/epsI;
+    const real_t factor1 = 2.0 / ((1.0 + ratio) * epsI * E0 * FOUR_PI);
+    const real_t factor2 = 2.0 / ((1.0 + 1.0 / ratio) * epsI * E0 * FOUR_PI);
+
+    const std::vector<Triangle>& triangles = surface.triangles();
+    std::size_t ntr = triangles.size();
+
+    std::size_t ncol = ntr * ntr;
+    b = rvector_t(ncol);
+    for (std::size_t i = 0; i != ncol; ++i) {
+      b(i) = 0.0;
+    }
+    
+    for (std::size_t i = 0; i != ntr; ++i) {
+      const Triangle& triangle = triangles[i];
+      normal_t n0 = triangle.normal();
+      for (const Atom& atom : atoms) {
+	position_t r = atom.position();
+	auto pair = dFdn_(r, triangle);
+	real_t dFdn = pair.first;
+	length_t R ) pair.second;
+	charge_t q = atom.charge();
+	b(i) += factor * q / R;
+	
+      }
+    }    
   }
 
   FlatTrianglesBEM::FlatTrianglesBEM(const permittivity_t& epsI,
 				     const permittivity_t& epsO,
 				     const ionic_strength_t& I) :
-    BEM(), epsI_(epsI), epsO_(epsO), I_(I), indx_{}, luQR_{}
+    BEM(), epsI_(epsI), epsO_(epsO), I_(I), ka_{}, indx_{}, luQR_{}
   {
     if ( epsI_ <= 0.0 || epsO_ <= 0.0 ) {
       throw std::domain_error("BEM: Permittivities must be non-negative numbers.");
@@ -156,15 +308,20 @@ namespace simploce {
     if ( I_ < 0.0 ) {
       throw std::domain_error("BEM: Ionic strength cannot be a negative number.");
     }
+
+    real_t R = MUUnits<real_t>::R;
+    real_t F = MUUnits<real_t>::F;
+    real_t T = SIUnits<real_t>::roomT;
+    ka_ = 2.0 * I_ * F * F / ( epsO * MUUnits<real_t>::E0 * R * T * T);
   }
 
   void FlatTrianglesBEM::kernels(const TriangulatedSurface& surface)
   {
     matrix_t S;
     if ( I_ > 0.0 ) {
-      KLMN_(surface, epsI_, epsO_, S);
+      L1234_(surface, epsI_, epsO_, ka_, S);
     } else {
-      L0_(surface, epsI_, epsO_, S);
+      L1_0_(surface, epsI_, epsO_, S);
     }
 
     /*
@@ -218,10 +375,15 @@ namespace simploce {
       for (std::size_t j = 0; j != triangles.size(); ++j) {
 	const Triangle& triangle = triangles[j];
 	area_t area = triangle.area();
-	real_t dFdn = dFdn_(ri, triangle);
-	potentials[i] += factor * dFdn * x[j] * area;
+	auto dFdn = dFdn_(ri, triangle);
+	potentials[i] += factor * dFdn.second * x[j] * area;
       }
     }
+  }
+
+  real_t FlatTrianglesBEM::inverseDebyeScreeningLength()
+  {
+    return ka_;
   }
 
 }

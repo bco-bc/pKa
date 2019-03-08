@@ -52,6 +52,11 @@ namespace simploce {
 			   const std::vector<position_t> positions,
 			   std::vector<elec_pot_t>& potentials) = 0;
 
+    /**
+     * Returns the inverse Debye Screening Length.
+     */
+    virtual real_t inverseDebyeScreeningLength() = 0;
+
   };
   
 }

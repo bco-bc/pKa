@@ -8,8 +8,8 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 EIGEN = /usr/include/eigen3
 
 # Location of MKL header files.
-#MKLROOT = /localdisk/intel/mkl
-MKLROOT = /home/juffer/intel/mkl
+MKLROOT = /localdisk/intel/mkl
+#MKLROOT = /home/juffer/intel/mkl
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -68,7 +68,7 @@ CFLAGS_EIGEN = -m64 -DEIGEN_USE_MKL_ALL
 CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread $(CFLAGS_EIGEN)
 LDFLAGS_EIGEN = -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed
 LDFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -L. -L$(PREFIX)/lib -pthread $(LDFLAGS_EIGEN)
-LIBS_EIGEN = -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -ldl -liomp5 -lblas -llapacke
+LIBS_EIGEN = -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -ldl -lblas -llapack
 LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz $(LIBS_EIGEN)
 #-lz for zlib
 

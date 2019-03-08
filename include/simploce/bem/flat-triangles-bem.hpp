@@ -37,12 +37,17 @@ namespace simploce {
 		   const rvector_t& x,
 		   const std::vector<position_t> positions,
 		   std::vector<elec_pot_t>& potentials) override;
+
+    real_t inverseDebyeScreeningLength() override;
     
   private:
     
     permittivity_t epsI_;
     permittivity_t epsO_;
     ionic_strength_t I_;
+
+    // Inverse debye length.
+    real_t ka_;
 
     // Pivot information.
     ivector_t indx_;
