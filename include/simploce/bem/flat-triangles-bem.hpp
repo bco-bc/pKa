@@ -46,7 +46,7 @@ namespace simploce {
     permittivity_t epsO_;
     ionic_strength_t I_;
 
-    // Inverse debye length.
+    // Inverse debye length.    
     real_t ka_;
 
     // Pivot information.

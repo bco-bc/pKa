@@ -30,9 +30,13 @@ int main(int argc, char *argv[])
 
   permittivity_t epsI{4.0};
   permittivity_t epsO{78.5};
-  ionic_strength_t I{0.0};
+  ionic_strength_t I{0.10};
 
   bem_t bem(epsI, epsO, I);
+  real_t ka = bem.inverseDebyeScreeningLength();
+  std::clog << "Ionic strength:       " << I << " mol/l" << std::endl;
+  std::clog << "Inverse Debye length: " << ka << " 1/nm" << std::endl;
+  std::clog << "Debye length:         " << 1.0/ka << " nm" << std::endl;
   bem.kernels(*surface);
   //std::clog << S << std::endl;
   //std::clog << std::endl;

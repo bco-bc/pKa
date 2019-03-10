@@ -8,8 +8,8 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 EIGEN = /usr/include/eigen3
 
 # Location of MKL header files.
-MKLROOT = /localdisk/intel/mkl
-#MKLROOT = /home/juffer/intel/mkl
+#MKLROOT = /localdisk/intel/mkl
+MKLROOT = /home/juffer/intel/mkl
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -20,7 +20,7 @@ VPATH = ../include/simploce/surface \
         ../tests \
         ../apps
 
-TEMPLATES = lu.hpp
+TEMPLATES = lu.hpp mu-units.hpp si-units.hpp 
 
 INCLUDE = conf.hpp types.hpp \
           factory.hpp surface.hpp triangulated-surface.hpp triangle.hpp edge.hpp vertex.hpp \
