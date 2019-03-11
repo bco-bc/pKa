@@ -40,11 +40,12 @@ namespace simploce {
     virtual void solve(rvector_t& b) = 0;
 
     /**
-     * Given the solution x of Ax=b, this methods returns the reaction electrostatic 
+     * Given the solution x of Ax=b, this methods returns the -reaction- electrostatic 
      * potentials at the given positions.
      * @param surface - Triangulated surface.
      * @param x - Solution of Ax=b
-     * @param positions - Coordinates of positions at which the potential is to be calculated.
+     * @param positions - Coordinates of positions at which the reaction potential should  
+     * be calculated.
      * @param potentials - Upon return, holds electrostatic reaction potentials at positions.
      */
     virtual void integrate(const TriangulatedSurface& surface,
