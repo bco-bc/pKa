@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   }
   std::string fileName(argv[1]);
   std::ifstream stream;
-  openInputFile(stream, fileName);
+  util::openInputFile(stream, fileName);
 
   // Spherical surface with radius 2.0 nm.
   radius_t radius = 2.0;

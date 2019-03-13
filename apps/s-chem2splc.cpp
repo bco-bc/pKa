@@ -21,7 +21,7 @@ enum Format { pdb, gmx };
 int main(int argc, char *argv[])
 {
   std::string fnInputProtein{"1abc.pdb"};
-  std::string fnOutputProtein{"protein.structure"};
+  std::string fnOutputProtein{"1abc.splc"};
   Format format{pdb};
 
   po::options_description usage("Usage");
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
      "Input file name of protein structure. Default is '1abc.pdb'.")
 
     ("fn-output-protein", po::value<std::string>(&fnOutputProtein),
-     "Output file name of protein structure. Default is 'protein.structure'.")
+     "Output file name of protein structure. Default is '1abc.splc'.")
 
     ("pdb", "Assume PDB format for protein structure. This is the default.")
     ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
   std::clog << "Number of atoms: " << structure.size() << std::endl;
 
   // Write protein structure to output file.
-  openOutputFile(ostream, fnOutputProtein);
+  util::openOutputFile(ostream, fnOutputProtein);
   ostream << structure << std::endl;
   ostream.close();
   std::clog << "Protein strcuture written to output file '"

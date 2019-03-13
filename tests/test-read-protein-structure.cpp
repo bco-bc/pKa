@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
   }
   std::string fileName(argv[1]);
   std::ifstream stream;
-  openInputFile(stream, fileName);
+  util::openInputFile(stream, fileName);
 
   atom_catalog_ptr_t catalog = Factory::atomCatalog();
 

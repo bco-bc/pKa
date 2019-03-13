@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
   std::clog << "Number of atoms: " << structure.size() << std::endl;
 
   // Write protein structure to output file.
-  openOutputFile(ostream, fnOutputProtein);
+  util::openOutputFile(ostream, fnOutputProtein);
   ostream << structure << std::endl;
   ostream.close();
   std::clog << "Protein strcuture written to output file '"
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   std::clog << "Volume (nm^3): " << surface.volume() << std::endl;
 
   // Write surface to output file.
-  openOutputFile(ostream, fnOutputDottedSurface);
+  util::openOutputFile(ostream, fnOutputDottedSurface);
   ostream << surface << std::endl;
   ostream.close();
   std::clog << "Dotted surface written to output file '"
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
   TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator, spherical, radius);
   
   // Write surface to output file.
-  openOutputFile(ostream, fnOutputTriangulatedSurface);
+  util::openOutputFile(ostream, fnOutputTriangulatedSurface);
   ostream << triangulatedSurface << std::endl;
   ostream.close();
   std::clog << "Triangulated surface written to output file '"

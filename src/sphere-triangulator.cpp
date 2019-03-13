@@ -397,7 +397,7 @@ namespace simploce {
                                    ));
     }
     // Wait for these tasks to complete in other threads.
-    std::vector<MappingResult> results = wait_for_all<MappingResult>(futures);
+    std::vector<MappingResult> results = util::wait_for_all<MappingResult>(futures);
 
     // Current thread.
     const entity_range_t& range = ranges[ranges.size() - 1];

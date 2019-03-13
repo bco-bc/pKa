@@ -8,8 +8,8 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 EIGEN = /usr/include/eigen3
 
 # Location of MKL header files.
-#MKLROOT = /localdisk/intel/mkl
-MKLROOT = /home/juffer/intel/mkl
+MKLROOT = /localdisk/intel/mkl
+#MKLROOT = /home/juffer/intel/mkl
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -20,14 +20,14 @@ VPATH = ../include/simploce/surface \
         ../tests \
         ../apps
 
-TEMPLATES = lu.hpp mu-units.hpp si-units.hpp 
+TEMPLATES = lu.hpp mu-units.hpp si-units.hpp util.hpp
 
 INCLUDE = conf.hpp types.hpp \
           factory.hpp surface.hpp triangulated-surface.hpp triangle.hpp edge.hpp vertex.hpp \
           triangulator.hpp sphere-triangulator.hpp \
           tetrahedron-triangulator.hpp nsc.hpp dotted-surface-generator.hpp \
           chem-reader.hpp pdb-reader.hpp input-source.hpp content-handler.hpp \
-          base-content-handler.hpp \
+          base-content-handler.hpp gmx-reader.hpp \
           file-input-source.hpp logger-content-handler.hpp \
           protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp atom-group.hpp \
           protein-structure-content-handler.hpp \
@@ -35,7 +35,7 @@ INCLUDE = conf.hpp types.hpp \
 
 SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
       tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
-      pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp \
+      pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp gmx-reader.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
       flat-triangles-bem.cpp base-content-handler.cpp atom-group.cpp coulomb.cpp
@@ -44,7 +44,7 @@ TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test
         test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp \
         test-lu.cpp test-coulomb.cpp
 
-APPS = s-tri-surface.cpp
+APPS = s-tri-surface.cpp s-chem2splc.cpp
 
 SOBJ = $(SRC:.cpp=.o)
 LOBJ = $(SRC:.cpp=.lo)
