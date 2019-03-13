@@ -22,18 +22,18 @@ int main()
 
   atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
   atom_spec_ptr_t spec = atomCatalog->lookup("N");
-  std::vector<Atom> atoms;
+  std::vector<atom_ptr_t> atoms;
   
-  Atom p1{std::string{"N1"}, position_t{-1.0, 0.0, -c}, spec};
+  atom_ptr_t p1 = Atom::make(std::string{"N1"}, position_t{-1.0, 0.0, -c}, spec);
   atoms.push_back(p1);
   
-  Atom p2{std::string{"N2"}, position_t{+1.0, 0.0, -c}, spec};
+  atom_ptr_t p2 = Atom::make(std::string{"N2"}, position_t{+1.0, 0.0, -c}, spec);
   atoms.push_back(p2);
 
-  Atom p3{std::string{"N3"}, position_t{0.0, +1.0, -c}, spec};
+  atom_ptr_t p3 = Atom::make(std::string{"N3"}, position_t{0.0, +1.0, -c}, spec);
   atoms.push_back(p3);
   
-  Atom p4{std::string{"N4"}, position_t{0.0, -1.0, -c}, spec};
+  atom_ptr_t p4 = Atom::make(std::string{"N4"}, position_t{0.0, -1.0, -c}, spec);
   atoms.push_back(p4);
 
   Surface surface = generateDottedSurface(atoms, 600);

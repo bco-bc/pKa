@@ -15,11 +15,14 @@ namespace simploce {
   public:
 
     /**
-     * Constructor.
+     * Constructor. This class will take full ownership of atoms.
      * @param title - Descriptive title
      * @param atoms - Atoms
+     * @param atomGroups - Atom groups (e.g. residues).
      */
-    ProteinStructure(const std::string& title, const std::vector<Atom>& atoms);
+    ProteinStructure(const std::string& title,
+		     const std::vector<atom_ptr_t>& atoms,
+		     const std::vector<AtomGroup>& atomGroups);
 
     /**
      * Returns title.
@@ -27,10 +30,16 @@ namespace simploce {
     std::string title() const;
 
     /**
-     * Returns size.
+     * Returns number of atoms.
      * @return Number of atoms.
      */
-    std::size_t size() const;
+    std::size_t numberOfAtoms() const;
+
+    /**
+     * Returns number of atom groups.
+     * @return Number of atom groups.
+     */
+    std::size_t numberOfAtomGroups() const;
 
     /**
      * Generates a dotted surface.
@@ -38,9 +47,14 @@ namespace simploce {
     Surface dottedSurface() const;
 
     /**
-     * Return atoms.
+     * Return all atoms.
      */
-    const std::vector<Atom>& atoms();
+    const std::vector<atom_ptr_t >& atoms() const;
+
+    /**
+     * Returns all atom groups.
+     */
+    const std::vector<AtomGroup>& atomGroups() const;
 
     /**
      * Writes this protein structure to output stream.
@@ -60,7 +74,8 @@ namespace simploce {
   private:
     
     std::string title_;
-    std::vector<Atom> atoms_;
+    std::vector<atom_ptr_t> atoms_;
+    std::vector<AtomGroup> atomGroups_;
   };
 
   /**

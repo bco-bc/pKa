@@ -69,6 +69,28 @@ namespace simploce {
      */
     atom_spec_ptr_t spec() const;
 
+    /**
+     * Returns new atom. An identifier is generated.
+     * @param name - Atom name.
+     * @param r - Atom position.
+     * @param spec - Atom specification.
+     */
+    static atom_ptr_t make(const std::string& name,
+			   const position_t& r,
+			   const atom_spec_ptr_t& spec);
+
+    /**
+     * Returns new atom.
+     * @param id - Unique identifier.
+     * @param name - Atom name.
+     * @param r - Atom position.
+     * @param spec - Atom specification.
+     */
+    static atom_ptr_t make(const id_t& id,
+			   const std::string& name,
+			   const position_t& r,
+			   const atom_spec_ptr_t& spec);
+
   private:
     
     id_t id_;

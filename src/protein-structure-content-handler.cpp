@@ -8,16 +8,10 @@
 
 namespace simploce {
 
-  static std::string title_{};
-  static std::vector<AtomGroup> atomGroups_{};
-  static AtomGroup atomGroup_{};
-  static std::vector<Atom> atoms_{};  
-  static std::string atomName_{};
-  static position_t r_{};
-
   ProteinStructureContentHandler::
   ProteinStructureContentHandler(const atom_catalog_ptr_t& atomCatalog) :
-    BaseContentHandler{}, atomCatalog_{atomCatalog} 
+    BaseContentHandler{}, atomCatalog_{atomCatalog}, title_{}, atomGroups_{},
+    atomGroupName_{""}, atomGroupId_{-1}, atomGroup_{}, atoms_{}, atomName_{}, r_{}
   {
     if ( !atomCatalog_ ) {
       throw std::domain_error("ProteinStructureContentHandler: atom catalog must be provided.");
@@ -28,16 +22,28 @@ namespace simploce {
   {
     atomGroups_.clear();
     atoms_.clear();
-    simploce::title_ = title;
+    title_ = title;
   }
 
   void ProteinStructureContentHandler::startAtomGroup(const std::string &atomGroupName)
   {
-    atomGroup_ = AtomGroup{atomGroupName};   
+    atomGroup_ = AtomGroup{};
+    atomGroupName_ = atomGroupName;
   }
 
   void ProteinStructureContentHandler::endAtomGroup()
   {
+    if ( atomGroupId_ != -1 ) {
+      AtomGroup::id_t id = AtomGroup::id_t(atomGroupId_);
+      AtomGroup atomGroup{id, atomGroupName_};
+      atomGroup.add(atomGroup_.atoms());
+      atomGroups_.push_back(atomGroup);
+    } else {
+      AtomGroup atomGroup(atomGroupName_);
+      atomGroup.add(atomGroup_.atoms());
+      atomGroups_.push_back(atomGroup);
+    }
+    atomGroupId_ = -1;
   }
 
   void ProteinStructureContentHandler::startAtom(const std::string &atomName)
@@ -53,14 +59,21 @@ namespace simploce {
   void ProteinStructureContentHandler::endAtom()
   {
     atom_spec_ptr_t spec = atomCatalog_->lookup(atomName_);
-    Atom atom{atomName_, r_, spec};
+    atom_ptr_t atom = Atom::make(atomName_, r_, spec);
     atoms_.push_back(atom);
-    
+    atomGroup_.add(atom);
+  }
+
+  void ProteinStructureContentHandler::index(int index)
+  {
+    if (atomGroupId_ == -1 ) {
+      atomGroupId_ = index;
+    }
   }
 
   ProteinStructure ProteinStructureContentHandler::proteinStructure() const
   {
-    return ProteinStructure{simploce::title_, atoms_};
+    return ProteinStructure{title_, atoms_, atomGroups_};
   }
 
   std::shared_ptr<ProteinStructureContentHandler>

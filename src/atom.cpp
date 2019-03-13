@@ -53,6 +53,21 @@ namespace simploce {
     return spec_;
   }
 
+  atom_ptr_t Atom::make(const std::string& name,
+			const position_t& r,
+			const atom_spec_ptr_t& spec)
+  {
+    return std::make_shared<Atom>(name, r, spec);
+  }
+
+  atom_ptr_t Atom::make(const id_t& id,
+			const std::string& name,
+			const position_t& r,
+			const atom_spec_ptr_t& spec)
+  {
+    return std::make_shared<Atom>(id, name, r, spec);
+  }
+  
   std::ostream& operator << (std::ostream& stream, const Atom& atom)
   {
     stream << std::setw(WIDTH) << atom.id()();

@@ -10,14 +10,14 @@ namespace simploce {
    * Reles on NSC.
    * See nsc.hpp for references.
    */
-  Surface generateDottedSurface(const std::vector<Atom>& atoms, std::size_t nod)
+  Surface generateDottedSurface(const std::vector<atom_ptr_t>& atoms, std::size_t nod)
   {
     std::size_t natoms = atoms.size();
     real_t *r = new double[3 * natoms], *radii = new double[natoms];
 
     // Get positions and radii.
     for (std::size_t i = 0; i != natoms; ++i) {
-      const Atom& atom = atoms[i];
+      const Atom& atom = *atoms[i];
       position_t ri = atom.position();
       std::size_t i3 = 3 * i;
       for (std::size_t k = 0; k != 3; ++k) {

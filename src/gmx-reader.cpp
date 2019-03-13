@@ -122,10 +122,13 @@ namespace simploce {
       if ( residueIndex == 0) {
 	// First residue encountered.
 	residueIndex = pair.first;
+	handler_->startAtomGroup(residueName);
+	handler_->index(residueIndex);
       } else {
 	// Same or new residue?
 	if ( residueIndex != pair.first) {
 	  // New residue encountered.
+	  handler_->endAtomGroup();
 	  residueIndex = pair.first;
 	  handler_->startAtomGroup(residueName);
 	  handler_->index(residueIndex);
@@ -143,10 +146,12 @@ namespace simploce {
 
       itemsIter_ += 6;
     }
-    // The last line contains box sizes. Not needed.
-    
+
+    handler_->endAtomGroup();
     handler_->endMolecule();
     handler_->end();
+    
+    // The last line contains box sizes. Not needed.    
   }
 
   std::string GMXReaderHelper::findTitle_()

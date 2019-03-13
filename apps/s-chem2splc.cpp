@@ -95,7 +95,8 @@ int main(int argc, char *argv[])
   // Get protein structure
   ProteinStructure structure = contentHandler->proteinStructure();
   std::clog << "Title: " << structure.title() << std::endl;
-  std::clog << "Number of atoms: " << structure.size() << std::endl;
+  std::clog << "Number of atoms: " << structure.numberOfAtoms() << std::endl;
+  std::clog << "Number of atom groups: " << structure.numberOfAtomGroups() << std::endl;
 
   // Write protein structure to output file.
   util::openOutputFile(ostream, fnOutputProtein);

@@ -182,6 +182,11 @@ namespace simploce {
   using atom_ptr_t = std::shared_ptr<Atom>;
 
   /**
+   * Atom group, such as a protein residue.
+   */
+  class AtomGroup;
+
+  /**
    * Atom specification (type).
    */
   class AtomSpec;
