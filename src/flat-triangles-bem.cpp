@@ -483,7 +483,7 @@ namespace simploce {
 				 std::ref(epsI),
 				 std::ref(epsO),
 				 std::ref(ka)));
-    results = wait_for_all<Result>(futures);
+    results = util::wait_for_all<Result>(futures);
 
     // ...plus the current thread.
     Result result = L4_(surface, epsI, epsO, ka);

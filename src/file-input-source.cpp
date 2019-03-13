@@ -19,7 +19,7 @@ namespace simploce {
     sourceId_(fileName), source_{}
   {
     std::ifstream stream;
-    openInputFile(stream, fileName);
+    util::openInputFile(stream, fileName);
     populateSource(source_, stream);
     stream.close();
   }

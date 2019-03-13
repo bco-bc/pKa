@@ -2,28 +2,13 @@
 #include "simploce/protein/content-handler.hpp"
 #include "simploce/protein/input-source.hpp"
 #include "simploce/util/mu-units.hpp"
+#include "simploce/util/util.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <cmath>
-
-using namespace simploce;
-
-/**
- * Test whether given string represent a non-negative number.
- */
-static bool isNonNegativeInteger(const std::string& s)
-{
-  try {
-    int n = boost::lexical_cast<int>(s);
-    return n >= 0 ? true : false;
-  } catch(std::exception exception) {
-    // Not a number.
-    return false;
-  }    
-}
 
 namespace simploce {
   
@@ -32,7 +17,7 @@ namespace simploce {
    */
   class PDBReaderHelper {
   public:
-    
+
     /**
      * Set of standard protein amino acid names
      */
@@ -117,7 +102,10 @@ namespace simploce {
     static std::string aa_names_[];
   };
   
-
+  PDBReader::PDBReader() : ChemReader()
+  {
+  }
+    
   void PDBReader::contentHandler(const content_handler_ptr_t &handler)
   {
     handler_ = handler;
@@ -226,7 +214,7 @@ namespace simploce {
       return false;
     }
    
-    if ( !isNonNegativeInteger(chainId) ) {
+    if ( !util::isNonNegativeInteger(chainId) ) {
       foundChainId = true;
     } else {
       chainId = *(current + 4);
@@ -317,7 +305,7 @@ namespace simploce {
       
     // Test whether residueName is a positive integer.
     //std::clog << "Verifying '" << residueName << "' is truly a residueName." << std::endl;
-    if ( isNonNegativeInteger(residueName) ) {
+    if ( util::isNonNegativeInteger(residueName) ) {
       //std::clog << "It is a positive integer number. Go three forward." << std::endl;
       iter = current + 3;
     } else {
@@ -329,11 +317,11 @@ namespace simploce {
     residueName = *iter;
 
     std::string s = *(iter + 1);
-    if ( isNonNegativeInteger(s) ) {
+    if ( util::isNonNegativeInteger(s) ) {
       residueIndex = boost::lexical_cast<int>(s);
     } else {
       std::string s = *(iter + 2);
-      if ( isNonNegativeInteger(s) ) {
+      if ( util::isNonNegativeInteger(s) ) {
 	residueIndex = boost::lexical_cast<int>(s);
       }
     }
@@ -365,7 +353,7 @@ namespace simploce {
     }
 
     std::string s = *(current + 1);
-    if ( !isNonNegativeInteger(s) ) {
+    if ( !util::isNonNegativeInteger(s) ) {
       return false;
     }
 
@@ -388,7 +376,7 @@ namespace simploce {
 
     int atomIndex{0};
     std::string s = *(current + 1);
-    if ( isNonNegativeInteger(s) ) {
+    if ( util::isNonNegativeInteger(s) ) {
       atomIndex = boost::lexical_cast<int>(*(current + 1));
     }
     std::string atomName = *(current + 2);

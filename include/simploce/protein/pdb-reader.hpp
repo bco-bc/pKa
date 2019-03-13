@@ -12,7 +12,7 @@ namespace simploce {
 
   public:
 
-    PDBReader() : ChemReader() {}
+    PDBReader();
 
     void contentHandler(const content_handler_ptr_t &handler) override;
 
