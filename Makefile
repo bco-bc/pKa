@@ -8,8 +8,8 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 EIGEN = /usr/include/eigen3
 
 # Location of MKL header files.
-MKLROOT = /localdisk/intel/mkl
-#MKLROOT = /home/juffer/intel/mkl
+#MKLROOT = /localdisk/intel/mkl
+MKLROOT = /home/juffer/intel/mkl
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \

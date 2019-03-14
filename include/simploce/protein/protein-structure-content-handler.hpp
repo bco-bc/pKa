@@ -33,7 +33,7 @@ namespace simploce {
     /**
      * Returns protein structure.
      */
-    ProteinStructure proteinStructure() const;
+    prot_struct_ptr_t proteinStructure() const;
 
     /**
      * Returns content handler.

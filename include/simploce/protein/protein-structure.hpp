@@ -15,6 +15,11 @@ namespace simploce {
   public:
 
     /**
+     * Constructor. Empty protein.
+     */
+    ProteinStructure();
+
+    /**
      * Constructor. This class will take full ownership of atoms.
      * @param title - Descriptive title
      * @param atoms - Atoms
@@ -70,6 +75,16 @@ namespace simploce {
      * @return protein structure.
      */
     static prot_struct_ptr_t make(std::istream& stream, const atom_catalog_ptr_t& catalog);
+
+    /**
+     * Creates a protein structure.
+     * @param title - Descriptive title
+     * @param atoms - Atoms
+     * @param atomGroups - Atom groups (e.g. residues).
+     */
+    static prot_struct_ptr_t make(const std::string& title,
+				  const std::vector<atom_ptr_t>& atoms,
+				  const std::vector<AtomGroup>& atomGroups);
 
   private:
     

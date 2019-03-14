@@ -30,6 +30,11 @@ namespace simploce {
     return std::vector<atom_ptr_t>{moved};
   }
 
+  ProteinStructure::ProteinStructure() :
+    title_{}, atoms_{}, atomGroups_{}
+  {
+  }
+
   ProteinStructure::ProteinStructure(const std::string& title,
 				     const std::vector<atom_ptr_t>& atoms,
 				     const std::vector<AtomGroup>& atomGroups) :
@@ -79,6 +84,7 @@ namespace simploce {
       const AtomGroup& atomGroup = atomGroups_[i];
       stream << atomGroup.id()() << SPACE << atomGroup.name();
       std::vector<atom_ptr_t> atoms = atomGroup.atoms();
+      stream << SPACE << atoms.size();
       for (auto atom : atoms) {
 	stream << SPACE << atom->id()();
       }
@@ -104,7 +110,8 @@ namespace simploce {
     std::size_t natoms;
     stream >> natoms;
     std::getline(stream, buffer);        // Reads EOL.
- 
+
+    // Atoms
     std::size_t id;
     real_t x, y, z;
     std::string name;
@@ -127,10 +134,43 @@ namespace simploce {
       name.clear();
     }
 
+    // Atom groups.
     std::vector<AtomGroup> atomGroups;
+    std::size_t nAtomGroups, atomId;
+    stream >> nAtomGroups;
+    std::getline(stream, buffer);
+    std::vector<atom_ptr_t> atms{};
+    for (std::size_t i = 0; i != nAtomGroups; ++i) {
+      name.clear();
+      atms.clear();
+      stream >> id;
+      char ch = stream.get();
+      while (ch == ' ') {
+	ch = stream.get();
+      }
+      while ( ch != ' ') {
+	name.push_back(ch);
+	ch = stream.get();
+      }
+      stream >> natoms;
+      for (std::size_t j = 0; j != natoms; ++j) {
+	stream >> atomId;
+	atms.push_back(atoms[atomId - 1]);  // atomId starts at 1.
+      }
+      AtomGroup atomGroup(AtomGroup::id_t{id}, name);
+      atomGroup.add(atms);
+      atomGroups.push_back(atomGroup);
+    }
     return std::make_shared<ProteinStructure>(title, atoms, atomGroups);
   }
 
+  prot_struct_ptr_t ProteinStructure::make(const std::string& title,
+					   const std::vector<atom_ptr_t>& atoms,
+					   const std::vector<AtomGroup>& atomGroups)
+  {
+    return std::make_shared<ProteinStructure>(title, atoms, atomGroups);
+  }
+  
   std::ostream& operator << (std::ostream& stream, const ProteinStructure& structure)
   {
     return structure.writeTo(stream);

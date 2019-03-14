@@ -93,14 +93,14 @@ int main(int argc, char *argv[])
   chemReader->parse(inputSource);
 
   // Get protein structure
-  ProteinStructure structure = contentHandler->proteinStructure();
-  std::clog << "Title: " << structure.title() << std::endl;
-  std::clog << "Number of atoms: " << structure.numberOfAtoms() << std::endl;
-  std::clog << "Number of atom groups: " << structure.numberOfAtomGroups() << std::endl;
+  prot_struct_ptr_t protein = contentHandler->proteinStructure();
+  std::clog << "Title: " << protein->title() << std::endl;
+  std::clog << "Number of atoms: " << protein->numberOfAtoms() << std::endl;
+  std::clog << "Number of atom groups: " << protein->numberOfAtomGroups() << std::endl;
 
   // Write protein structure to output file.
   util::openOutputFile(ostream, fnOutputProtein);
-  ostream << structure << std::endl;
+  ostream << *protein << std::endl;
   ostream.close();
   std::clog << "Protein strcuture written to output file '"
 	    << fnOutputProtein << "'." << std::endl;

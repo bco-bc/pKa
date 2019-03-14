@@ -20,7 +20,7 @@
 using namespace simploce;
 namespace po = boost::program_options;
 
-enum Format { pdb, gmx };
+enum Format { pdb, gmx, splc };
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
      "Input file name of protein structure. Default is '1abc.pdb'.")
 
     ("fn-output-protein", po::value<std::string>(&fnOutputProtein),
-     "Output file name of protein structure. Default is 'protein.structure'.")
+     "Output file name of protein structure. Default is 'protein.splc'. "
+     "Note that if the output format is that of simploce (splc), then no output is produced.")
     ("fn-output-dotted-surface", po::value<std::string>(&fnOutputDottedSurface),
      "Output file name of dotted surface. Default is 'dotted.srf'.")
     ("fn-output-triangulated-surface", po::value<std::string>(&fnOutputTriangulatedSurface),
@@ -86,6 +87,9 @@ int main(int argc, char *argv[])
   if ( vm.count("gmx") ) {
     format = gmx;
   }
+  if ( vm.count("splc") ) {
+    format = splc;
+  }
   if ( vm.count("spherical") ) {
     spherical = true;
   }
@@ -96,51 +100,67 @@ int main(int argc, char *argv[])
     ntriangles = vm["number-of-triangles"].as<std::size_t>();
   }
 
-  input_source_ptr_t inputSource = FileInputSource::make(fnInputProtein);
   chem_reader_ptr_t chemReader;
   switch (format) {
     case pdb: {
-      std::clog << inputSource->sourceId()
+      std::clog << fnInputProtein
 		<< ": Assuming PDB format for this input protein structure." << std::endl;
       chemReader = PDBReader::make();
       break;
     }
     case gmx: {
-      std::clog << inputSource->sourceId()
+      std::clog << fnInputProtein
 		<< ": Assuming GROMACS format for this input protein structure." << std::endl;
       chemReader = GMXReader::make();
       break;
     }
+    case splc: {
+      // Do nothing.
+      std::clog << fnInputProtein
+		<< ": Assuming SIMPLOCE format for this input protein structure." << std::endl;
+      break;
+    }
     default: {
+      std::clog << fnInputProtein
+		<< ": Assuming PDB format for this input protein structure." << std::endl;
       chemReader = PDBReader::make();
       break;
     }
   };
 
+  prot_struct_ptr_t protein;
   std::ofstream ostream;
 
   // Read chemical content.
   atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
-  std::shared_ptr<ProteinStructureContentHandler> contentHandler =
-    ProteinStructureContentHandler::make(atomCatalog);
-  chemReader->contentHandler(contentHandler);
-  chemReader->parse(inputSource);
-
-  // Get protein structure
-  ProteinStructure structure = contentHandler->proteinStructure();
-  std::clog << "Title: " << structure.title() << std::endl;
-  std::clog << "Number of atoms: " << structure.numberOfAtoms() << std::endl;
-  std::clog << "Number of atom groups: " << structure.numberOfAtomGroups() << std::endl;
+  if ( format != splc) {
+    input_source_ptr_t inputSource = FileInputSource::make(fnInputProtein);
+    std::shared_ptr<ProteinStructureContentHandler> contentHandler =
+      ProteinStructureContentHandler::make(atomCatalog);
+    chemReader->contentHandler(contentHandler);
+    chemReader->parse(inputSource);
+    protein = contentHandler->proteinStructure();
+  } else {
+    std::ifstream stream;
+    util::openInputFile(stream, fnInputProtein);
+    protein = ProteinStructure::make(stream, atomCatalog);
+    stream.close();
+  }
+  std::clog << "Title: " << protein->title() << std::endl;
+  std::clog << "Number of atoms: " << protein->numberOfAtoms() << std::endl;
+  std::clog << "Number of atom groups: " << protein->numberOfAtomGroups() << std::endl;
 
   // Write protein structure to output file.
-  util::openOutputFile(ostream, fnOutputProtein);
-  ostream << structure << std::endl;
-  ostream.close();
-  std::clog << "Protein strcuture written to output file '"
-	    << fnOutputProtein << "'." << std::endl;
+  if ( format != splc ) {
+    util::openOutputFile(ostream, fnOutputProtein);
+    ostream << *protein << std::endl;
+    ostream.close();
+    std::clog << "Protein strcuture written to output file '"
+	      << fnOutputProtein << "'." << std::endl;
+  }
 
   // Generate dotted surface.
-  Surface surface = structure.dottedSurface();
+  Surface surface = protein->dottedSurface();
   std::clog << "Surface area (nm^2): " << surface.area() << std::endl;
   std::clog << "Volume (nm^3): " << surface.volume() << std::endl;
 

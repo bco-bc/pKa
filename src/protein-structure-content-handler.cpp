@@ -71,9 +71,9 @@ namespace simploce {
     }
   }
 
-  ProteinStructure ProteinStructureContentHandler::proteinStructure() const
+  prot_struct_ptr_t ProteinStructureContentHandler::proteinStructure() const
   {
-    return ProteinStructure{title_, atoms_, atomGroups_};
+    return ProteinStructure::make(title_, atoms_, atomGroups_);
   }
 
   std::shared_ptr<ProteinStructureContentHandler>
