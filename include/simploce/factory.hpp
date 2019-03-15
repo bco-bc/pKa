@@ -13,6 +13,11 @@ namespace simploce {
     static atom_catalog_ptr_t atomCatalog();
 
     /**
+     * Returns the atom group specification catalog.
+     */
+    static atom_group_catalog_ptr_t atomGroupCatalog();
+
+    /**
      * Returns a triangulator.
      * @param ntriangles - Requested number of triangles.
      * @return Triangulator.

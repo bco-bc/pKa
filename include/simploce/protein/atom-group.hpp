@@ -5,11 +5,13 @@
 #include "simploce/util/id.hpp"
 #include <string>
 #include <vector>
+#include <map>
 
 namespace simploce {
 
   /**
-   * Group of atoms forming a logical unit. E.g. a protein residue.
+   * Group of atoms forming a logical unit. E.g. a protein residue. The group name is typically 
+   * those of residues, such as GLU or HIS.
    */
   class AtomGroup {
   public:
@@ -21,7 +23,7 @@ namespace simploce {
 
     /**
      * Constructor.
-     * Creates an empty group with no name.
+     * Creates an empty group with no name. An identifier is generated.
      */
     AtomGroup();
 
@@ -68,13 +70,66 @@ namespace simploce {
      */
     const std::vector<atom_ptr_t> atoms() const;
 
+    /**
+     * Specifies whether this group is protonatable.
+     * @param value - Specification.
+     */
+    void protonatable(bool value);
+
+    /**
+     * Is this group protonatable?
+     * @return Result.
+     */
+    bool protonatable() const;
+
+    /**
+     * Changes the current protonation state, depending on the current protonation state.
+     * @param catalog - Atom group specification catalog.
+     */
+    void changeProtonationState(const atom_group_catalog_ptr_t& catalog);
+
+    /**
+     * Returns protonantion state.
+     * @return Usually, 0 or 1, but 2 (e.g. HIS) or larger is possible as well.
+     */
+    std::size_t protonationState() const;
+
+    /**
+     * Returns group's total charge.
+     */
+    charge_t charge() const;
+
+    /**
+     * Translate this group.
+     */
+    void translate();
+
+    /**
+     * Rotate this group.
+     */
+    void rotate();
+
   private:
+
+    friend class ProteinStructure;
+
+    void protonationState_(std::size_t occupancy);
 
     id_t id_;
     std::string name_;
     std::vector<atom_ptr_t> atoms_;
-    
+    bool protonatable_;
+    std::size_t occupancy_;
+    std::size_t maximumOccupancy_;
   };
+
+  /**
+   * Writes atom group to output stream.
+   * @param stream - Output stream.
+   * @param atomGroup - Atom group.
+   * @return Output stream.
+   */
+  std::ostream& operator << (std::ostream& stream, const AtomGroup& atomGroup);
 
 }
 

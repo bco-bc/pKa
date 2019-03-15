@@ -25,7 +25,7 @@ enum Format { pdb, gmx, splc };
 int main(int argc, char *argv[])
 {
   std::string fnInputProtein{"1abc.pdb"};
-  std::string fnOutputProtein{"protein.structure"};
+  std::string fnOutputProtein{"protein.splc"};
   Format format{pdb};
   std::string fnOutputDottedSurface{"dotted.srf"};
   std::string fnOutputTriangulatedSurface{"triangulated.srf"};
@@ -36,18 +36,19 @@ int main(int argc, char *argv[])
   po::options_description usage("Usage");
   usage.add_options()
     ("fn-input-protein", po::value<std::string>(&fnInputProtein),
-     "Input file name of protein structure. Default is '1abc.pdb'.")
+     "Input file name of protein structure. Default is 'protein.pdb'.")
 
     ("fn-output-protein", po::value<std::string>(&fnOutputProtein),
      "Output file name of protein structure. Default is 'protein.splc'. "
-     "Note that if the output format is that of simploce (splc), then no output is produced.")
+     "Note that if the input format is that of simploce (splc), then no output is produced.")
     ("fn-output-dotted-surface", po::value<std::string>(&fnOutputDottedSurface),
      "Output file name of dotted surface. Default is 'dotted.srf'.")
     ("fn-output-triangulated-surface", po::value<std::string>(&fnOutputTriangulatedSurface),
      "Output file name of triangulated surface. Default is 'triangulated.srf'.")
 
     ("pdb", "Assume PDB format for protein structure. This is the default.")
-    ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
+    ("gmx", "Assume GROMACS format for protein structure. ")
+    ("splc", "Assume SIMPLOCE format for protein structure.")
     
     ("spherical", "Create a spherical triangulated surface.")
     ("radius", po::value<radius_t>(&radius), "Radius of spherical surface. Default is 2.0 nm.")

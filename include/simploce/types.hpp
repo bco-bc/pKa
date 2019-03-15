@@ -187,7 +187,7 @@ namespace simploce {
   class AtomGroup;
 
   /**
-   * Atom specification (type).
+   * Atom specification type.
    */
   class AtomSpec;
 
@@ -195,6 +195,16 @@ namespace simploce {
    * Atom specification pointer type.
    */
   using atom_spec_ptr_t = std::shared_ptr<AtomSpec>;
+
+  /**
+   * Atom group specification type.
+   */
+  class AtomGroupSpec;
+
+  /**
+   * Atom group specification pointer type.
+   */  
+  using atom_group_spec_ptr_t = std::shared_ptr<AtomGroupSpec>;
 
   /**
    * Atom specifications catalog.
@@ -205,6 +215,16 @@ namespace simploce {
    * Atom catalog pointer type.
    */
   using atom_catalog_ptr_t = std::shared_ptr<AtomCatalog>;
+
+  /**
+   * Atom group specification catalog.
+   */
+  class AtomGroupCatalog;
+
+  /**
+   * Atom group specification catalog pointer type.
+   */
+  using atom_group_catalog_ptr_t = std::shared_ptr<AtomGroupCatalog>;
 
   /**
    * Protein structure.

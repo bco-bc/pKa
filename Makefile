@@ -8,8 +8,8 @@ SIMUTIL = /home/ajuffer/PT-CGMD/sim-util/include
 EIGEN = /usr/include/eigen3
 
 # Location of MKL header files.
-#MKLROOT = /localdisk/intel/mkl
-MKLROOT = /home/juffer/intel/mkl
+MKLROOT = /localdisk/intel/mkl
+#MKLROOT = /home/juffer/intel/mkl
 
 VPATH = ../include/simploce/surface \
         ../include/simploce/protein \
@@ -30,15 +30,17 @@ INCLUDE = conf.hpp types.hpp \
           base-content-handler.hpp gmx-reader.hpp \
           file-input-source.hpp logger-content-handler.hpp \
           protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp atom-group.hpp \
+          atom-group-spec.hpp atom-group-catalog.hpp \
           protein-structure-content-handler.hpp \
-          flat-triangles-bem.hpp coulomb.hpp
+          flat-triangles-bem.hpp coulomb.hpp 
 
 SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
       tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
       pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp gmx-reader.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
-      flat-triangles-bem.cpp base-content-handler.cpp atom-group.cpp coulomb.cpp
+      flat-triangles-bem.cpp base-content-handler.cpp \
+      atom-group.cpp  atom-group-spec.cpp atom-group-catalog.cpp coulomb.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
         test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp \

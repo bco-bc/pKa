@@ -1,11 +1,13 @@
 #include "simploce/factory.hpp"
 #include "simploce/protein/atom-catalog.hpp"
+#include "simploce/protein/atom-group-catalog.hpp"
 #include "simploce/surface/sphere-triangulator.hpp"
 
 namespace simploce {
 
   static atom_catalog_ptr_t atomCatalog_{};
   static triangulator_ptr_t triangulator_{};
+  static atom_group_catalog_ptr_t atomGroupCatalog_{};
 
   atom_catalog_ptr_t Factory::atomCatalog()
   {
@@ -23,4 +25,12 @@ namespace simploce {
     return triangulator_;
   }
   
+  atom_group_catalog_ptr_t Factory::atomGroupCatalog()
+  {
+    if ( !atomGroupCatalog_) {
+      atomGroupCatalog_ = AtomGroupCatalog::make();
+    }
+    return atomGroupCatalog_;
+  }
+
 }

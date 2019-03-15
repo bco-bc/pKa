@@ -67,6 +67,11 @@ namespace simploce {
   {
     return std::make_shared<Atom>(id, name, r, spec);
   }
+
+  void Atom::changeSpec_(atom_spec_ptr_t& spec)
+  {
+    spec_ = spec;
+  }
   
   std::ostream& operator << (std::ostream& stream, const Atom& atom)
   {

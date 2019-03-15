@@ -82,12 +82,7 @@ namespace simploce {
     stream << atomGroups_.size() << std::endl;
     for (std::size_t i = 0; i != atomGroups_.size(); ++i) {
       const AtomGroup& atomGroup = atomGroups_[i];
-      stream << atomGroup.id()() << SPACE << atomGroup.name();
-      std::vector<atom_ptr_t> atoms = atomGroup.atoms();
-      stream << SPACE << atoms.size();
-      for (auto atom : atoms) {
-	stream << SPACE << atom->id()();
-      }
+      stream << atomGroup;
       if ( i != atomGroups_.size() - 1 ) {
 	stream << std::endl;
       }
@@ -140,6 +135,8 @@ namespace simploce {
     stream >> nAtomGroups;
     std::getline(stream, buffer);
     std::vector<atom_ptr_t> atms{};
+    bool protonatable{false};
+    std::size_t occupancy{0};
     for (std::size_t i = 0; i != nAtomGroups; ++i) {
       name.clear();
       atms.clear();
@@ -152,6 +149,7 @@ namespace simploce {
 	name.push_back(ch);
 	ch = stream.get();
       }
+      stream >> protonatable >> occupancy;
       stream >> natoms;
       for (std::size_t j = 0; j != natoms; ++j) {
 	stream >> atomId;
@@ -159,7 +157,11 @@ namespace simploce {
       }
       AtomGroup atomGroup(AtomGroup::id_t{id}, name);
       atomGroup.add(atms);
+      atomGroup.protonatable(protonatable);
+      atomGroup.protonationState_(occupancy);
       atomGroups.push_back(atomGroup);
+      protonatable = false;
+      occupancy = 0;
     }
     return std::make_shared<ProteinStructure>(title, atoms, atomGroups);
   }

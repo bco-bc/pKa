@@ -21,8 +21,14 @@ namespace simploce {
     AtomSpec(const AtomSpec &) = delete;
     AtomSpec &operator = (const AtomSpec &) = delete;
 
+    /**
+     * Returns atom radius.
+     */
     radius_t radius() const;
 
+    /**
+     * Returns atom charge.
+     */
     charge_t charge() const;
 
     /**

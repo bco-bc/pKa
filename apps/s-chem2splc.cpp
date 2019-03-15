@@ -20,8 +20,8 @@ enum Format { pdb, gmx };
 
 int main(int argc, char *argv[])
 {
-  std::string fnInputProtein{"1abc.pdb"};
-  std::string fnOutputProtein{"1abc.splc"};
+  std::string fnInputProtein{"protein.pdb"};
+  std::string fnOutputProtein{"protein.splc"};
   Format format{pdb};
 
   po::options_description usage("Usage");
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
      "Output file name of protein structure. Default is '1abc.splc'.")
 
     ("pdb", "Assume PDB format for protein structure. This is the default.")
-    ("gmx", "Assume GROMACS format for protein structure. Not yet implemented.")
+    ("gmx", "Assume GROMACS format for protein structure.")
 
     ("help", "Help message")
     ;

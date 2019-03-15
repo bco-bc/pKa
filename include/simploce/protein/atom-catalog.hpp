@@ -16,13 +16,13 @@ namespace simploce {
     AtomCatalog();
 
     /**
-     * Looks up a atom specification.
+     * Looks up an atom specification.
      * @param name - Atom name or specification name.
      */
     atom_spec_ptr_t lookup(const std::string& name) const;
 
     /**
-     * Returns ataom catalog.
+     * Returns atom catalog.
      */
     static atom_catalog_ptr_t make();
     

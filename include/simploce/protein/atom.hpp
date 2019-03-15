@@ -92,6 +92,13 @@ namespace simploce {
 			   const atom_spec_ptr_t& spec);
 
   private:
+
+    friend class AtomGroup;
+
+    /**
+     * Changes specification, e.g. due to a protonation event.
+     */
+    void changeSpec_(atom_spec_ptr_t& spec);
     
     id_t id_;
     std::string name_;
