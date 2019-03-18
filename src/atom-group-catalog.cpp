@@ -12,6 +12,11 @@ namespace simploce {
    * A key is defined as the number of bound protons (protonation state) and the name of an 
    * atom group. Thus, the pair (0, "ARG") specifies the deprotonated state of ARG.
    */
+  using key_t = std::pair<std::size_t, std::string>;
+
+  /**
+   * Container type for holding specifications.
+   */
   using container_t = std::map<std::pair<std::size_t, std::string>, atom_group_spec_ptr_t>;
 
   /**
@@ -20,14 +25,23 @@ namespace simploce {
   using iter_t = container_t::const_iterator;
 
   /**
-   * Container holding specifications.
+   * Actual Container holding specifications.
    */
   static container_t container_{};
+
+  static key_t makeKey(std::size_t occupancy, const std::string& name)
+  {
+    return std::make_pair(occupancy, name);
+  }
+
+  AtomGroupCatalog::~AtomGroupCatalog()
+  {
+  }
 
   std::size_t AtomGroupCatalog::maximumProtonOccupancy(const std::string& name) const
   {
     std::size_t maximum{0};
-    std::pair<std::size_t, std::string> key = std::make_pair(maximum, name);
+    key_t key = std::make_pair(maximum, name);
     iter_t iter = container_.find(key);
     while ( iter != container_.end() ) {
       key = std::make_pair(++maximum, name);
@@ -50,8 +64,12 @@ namespace simploce {
     return iter->second;
   }
 
-  atom_group_catalog_ptr_t AtomGroupCatalog::AtomGroupCatalog::make()
+  void AtomGroupCatalog::add(const atom_group_spec_ptr_t& spec, std::size_t occupancy)
   {
-    return std::make_shared<AtomGroupCatalog>();
+    std::string name = spec->name();
+    key_t key = std::make_pair(occupance, name);
+    std::pair value = std::make_pair(key, spec);
+    container_.insert(pair);
   }
+
 }

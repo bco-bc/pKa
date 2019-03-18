@@ -30,7 +30,7 @@ INCLUDE = conf.hpp types.hpp \
           base-content-handler.hpp gmx-reader.hpp \
           file-input-source.hpp logger-content-handler.hpp \
           protein-structure.hpp atom.hpp atom-spec.hpp atom-catalog.hpp atom-group.hpp \
-          atom-group-spec.hpp atom-group-catalog.hpp \
+          atom-group-spec.hpp atom-group-catalog.hpp gmx-atom-group-catalog.hpp \
           protein-structure-content-handler.hpp \
           flat-triangles-bem.hpp coulomb.hpp 
 
@@ -40,7 +40,8 @@ SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp ver
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
       flat-triangles-bem.cpp base-content-handler.cpp \
-      atom-group.cpp  atom-group-spec.cpp atom-group-catalog.cpp coulomb.cpp
+      atom-group.cpp  atom-group-spec.cpp atom-group-catalog.cpp gmx-atom-group-catalog.cpp \
+      coulomb.cpp
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
         test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp \

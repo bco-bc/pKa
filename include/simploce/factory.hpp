@@ -2,29 +2,30 @@
 #define FACTORY_HPP
 
 #include "types.hpp"
+#include <string>
 
 namespace simploce {
-
-  struct Factory {
+  namespace factory {
 
     /**
      * Returns atom specifications catalog.
      */
-    static atom_catalog_ptr_t atomCatalog();
+    atom_catalog_ptr_t atomCatalog();
 
     /**
-     * Returns the atom group specification catalog.
+     * Returns the atom group specification catalog from file.
+     * @param fileName - File name
      */
-    static atom_group_catalog_ptr_t atomGroupCatalog();
+    atom_group_catalog_ptr_t atomGroupCatalog(const std::string& fileName);
 
     /**
      * Returns a triangulator.
      * @param ntriangles - Requested number of triangles.
      * @return Triangulator.
      */
-    static triangulator_ptr_t triangulator(std::size_t ntriangles);
+    triangulator_ptr_t triangulator(std::size_t ntriangles);
 
-  };
+  }
 }
 
 #endif

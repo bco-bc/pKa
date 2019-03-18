@@ -10,12 +10,21 @@ namespace simploce {
   class AtomGroupSpec {
   public:
     
-    AtomGroupSpec();
+    AtomGroupSpec(const std::string& name);
 
+    /**
+     * Returns atom specification with given name.
+     */
     atom_spec_ptr_t lookup(const std::string& name) const;
+
+    /**
+     * Returns specification name.
+     */
+    std::string name() const;
     
   private:
 
+    std::string name_;
     std::map<std::string, atom_spec_ptr_t> specs_;
 
   };

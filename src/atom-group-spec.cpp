@@ -3,8 +3,8 @@
 
 namespace simploce {
 
-  AtomGroupSpec::AtomGroupSpec() :
-    specs_{}
+  AtomGroupSpec::AtomGroupSpec(const std::string& name) :
+    name_{name}, specs_{}
   {
   }
 
@@ -18,4 +18,10 @@ namespace simploce {
     }
     return (*iter).second;
   }
+
+  std::string name() const
+  {
+    return name_;
+  }
+      
 }
