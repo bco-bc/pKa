@@ -5,6 +5,7 @@
 #include "simploce/surface/vertex.hpp"
 #include <stdexcept>
 #include <iostream>
+#include <map>
 
 // Cgal Includes
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -13,7 +14,7 @@
 #include <CGAL/Triangulation_hierarchy_3.h>
 #include <CGAL/Triangulation_vertex_base_with_info_3.h>
 
-// Cgal def
+// Cgal typedefs 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef K::Point_3 Point_3;
 
@@ -38,84 +39,95 @@ namespace simploce {
 	std::clog << "WARNING: value of 'spherical' is ignored." << std::endl;
 	std::clog << "WARNING: value of 'radius' is used as alpha value." << std::endl;
 
-        // Convert in Point_3
+        // Convert position_t to Point_3
 	std::vector<Point_3> cgalPoints;
 	for (auto p : points)
 	{
 	    Point_3 cp(p.x(), p.y(), p.z());
 	    cgalPoints.push_back(cp);
 	}
-
-	// Insert in Alpha Shape.
-	Alpha_shape_3 surface(cgalPoints.begin(), cgalPoints.end());
+	
+	// Insert points into Alpha Shape.
+	Alpha_shape_3 surface(cgalPoints.begin(), cgalPoints.end(), Alpha_shape_3::REGULARIZED);
+	
+	// Identinfy alpha values corresponding to solid components
 	Alpha_shape_3::NT alpha_solid = surface.find_alpha_solid();
+	
+	// Get the optimal alpha value to get one single solid component
 	Alpha_shape_3::Alpha_iterator opt = surface.find_optimal_alpha(1);
+
+	// Set the alpha value to the optimal.
+	// After that point the surface return is the final alpha shape
+	surface.set_alpha(*opt);
 	std::clog << "CGAL: Using optimal alpha value "
 		  << *opt << " to get one connected component."<< std::endl;
-	surface.set_alpha(*opt);
 	assert(as.number_of_solid_components() == 1);
 
-	std::vector<Alpha_shape_3::Vertex_handle> vertexes;
-	std::vector<Alpha_shape_3::Cell_handle> cells;
+	std::vector<Alpha_shape_3::Vertex_handle> cgalVertices;
+	std::vector<Alpha_shape_3::Edge> cgalEdges;
 	std::vector<Alpha_shape_3::Facet> facets;
-	std::vector<Alpha_shape_3::Edge> segments;
 
-        surface.get_alpha_shape_vertices(std::back_inserter(vertexes), Alpha_shape_3::REGULAR);
-	surface.get_alpha_shape_cells(std::back_inserter(cells), Alpha_shape_3::INTERIOR);
-	surface.get_alpha_shape_facets(std::back_inserter(facets), Alpha_shape_3::REGULAR);
-	surface.get_alpha_shape_facets(std::back_inserter(facets), Alpha_shape_3::SINGULAR);
-	surface.get_alpha_shape_edges(std::back_inserter(segments), Alpha_shape_3::REGULAR);
+	// Only REGULAR element are keep. E.g. an edge is regular if it is shared by only
+	// two faces. This way, we end up with only edge that are ont the surface of the
+	// alpha shape.
+        surface.get_alpha_shape_vertices(std::back_inserter(cgalVertices),
+					 Alpha_shape_3::REGULAR);
+	surface.get_alpha_shape_edges(std::back_inserter(cgalEdges),
+				      Alpha_shape_3::REGULAR);
+	surface.get_alpha_shape_facets(std::back_inserter(facets),
+				       Alpha_shape_3::REGULAR);
 
-	std::cout << "Cells : " << cells.size() << std::endl;
-	std::cout << "Facets : " << facets.size() << std::endl;
-	std::cout << "Edges : " << segments.size() << std::endl;
-	
 	std::vector<vertex_ptr_t> vertices;
-	std::vector<Edge> edges;
-	std::vector<Triangle> triangles;
-	for (auto vertex : vertexes)
+	std::map<Point_3, vertex_ptr_t> verticesMap;
+	for (auto v_it : cgalVertices)
 	{
-	    Point_3 temp = vertex->point();
+	    Point_3 temp = v_it->point();
 	    position_t point(temp.x(), temp.y(), temp.z());
 	    vertex_ptr_t v = std::make_shared<vertex_t>(point);
+	    verticesMap[v_it->point()] = v;
 	    vertices.push_back(v);
 	}
 
-	for (auto edge : segments)
+	std::vector<Edge> edges;
+	for (auto e_it : cgalEdges)
 	{
-	    // std::cout << edge.second << " " << edge.third << std::endl;
-	    Edge e{vertices.at(edge.second), vertices.at(edge.third)};
-	    edges.push_back(e);
+	    auto tmp_tetra = e_it.get<0>();
+	    int p1, p2;
+	    p1 = e_it.get<1>();
+	    p2 = e_it.get<2>();
+	    Edge edge{verticesMap.find(tmp_tetra->vertex(p1)->point())->second,
+	    	    verticesMap.find(tmp_tetra->vertex(p2)->point())->second};
+	    edges.push_back(edge);
 	}
-	
-	for (std::size_t i=0; i < facets.size(); ++i)
-	{ 
-	//     To have a consistent orientation of the facet, always consider an exterior cell
-	    if (surface.classify(facets.at(i).first) != Alpha_shape_3::EXTERIOR)
+
+	std::vector<Triangle> triangles;
+	for (auto tri_it : facets)
+	{
+	    // Check orientation of the facet
+	    if (surface.classify(tri_it.first) != Alpha_shape_3::EXTERIOR)
 	    {
-		facets[i]=surface.mirror_facet(facets.at(i));
+	        tri_it = surface.mirror_facet(tri_it);
+	    }
+
+	    // Cycle throught the tetrahderon's vertices to get the facet
+	    std::vector<vertex_ptr_t> temp;
+	    auto tmp_tetra = tri_it.first;	    
+	    for (int i = 0; i < 4; i++) {
+		if (i != tri_it.second) {
+		    temp.push_back(verticesMap.find(tmp_tetra->vertex(i)->point())->second);
+		}
+	    }
+
+	    // Swap vertex to keep consistensy with orientation
+	    if (tri_it.second%2 == 0)
+	    {
+		std::swap(temp.at(0), temp.at(1));
 	    }
 	    
-	    CGAL_assertion(surface.classify(facets.at(i).first) == Alpha_shape_3::EXTERIOR);
-
-	    int indices[3]={(facets.at(i).second+1)%4,
-			    (facets.at(i).second+2)%4,
-			    (facets.at(i).second+3)%4,};
-
-	//     according to the encoding of vertex indices, this is needed to get
-	//     a consistent orienation
-	    if (facets.at(i).second%2==0)
-	    {
-		std::swap(indices[0], indices[1]);
-	    }
-
-	    // std::cout << indices[0] << " " << indices[1] << " " << indices [2] << std::endl;
-	    Triangle t{vertices.at(indices[0]),
-		    vertices.at(indices[1]),
-		    vertices.at(indices[2])};
-	    triangles.push_back(t);
+	    Triangle triangle{temp.at(0), temp.at(1), temp.at(2)};
+	    triangles.push_back(triangle);
 	}
-
+	
 	return TriangulatedSurface{vertices, triangles, edges};    
     }
     

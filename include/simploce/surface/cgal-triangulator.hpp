@@ -6,7 +6,9 @@
 namespace simploce {
 
   /**
-   * Creates a simple tetrahedron.
+   * Create a triangulated surface on cloud points.
+   * The triangulated surface is computed using Delaunay Triangulation
+   * and Alpha Shape from CGAL.  
    */
   struct CgalTriangulator : public Triangulator {    
 
