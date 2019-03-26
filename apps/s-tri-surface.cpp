@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
   std::ofstream ostream;
 
   // Read chemical content.
-  atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
+  atom_catalog_ptr_t atomCatalog = factory::atomCatalog();
   if ( format != splc) {
     input_source_ptr_t inputSource = FileInputSource::make(fnInputProtein);
     std::shared_ptr<ProteinStructureContentHandler> contentHandler =
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 	    << fnOutputDottedSurface << "'." << std::endl;
 
   // Triangulate.
-  triangulator_ptr_t triangulator = Factory::triangulator(ntriangles);
+  triangulator_ptr_t triangulator = factory::triangulator(ntriangles);
   TriangulatedSurface triangulatedSurface = surface.triangulate(triangulator, spherical, radius);
   
   // Write surface to output file.

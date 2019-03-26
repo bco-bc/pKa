@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   std::ofstream ostream;
 
   // Read chemical content.
-  atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
+  atom_catalog_ptr_t atomCatalog = factory::atomCatalog();
   std::shared_ptr<ProteinStructureContentHandler> contentHandler =
     ProteinStructureContentHandler::make(atomCatalog);
   chemReader->contentHandler(contentHandler);
