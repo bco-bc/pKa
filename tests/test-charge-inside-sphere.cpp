@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   //std::clog << S << std::endl;
   //std::clog << std::endl;
 
-  atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
+  atom_catalog_ptr_t atomCatalog = factory::atomCatalog();
   atom_spec_ptr_t spec = atomCatalog->lookup("T");
 
   std::size_t N = 200;

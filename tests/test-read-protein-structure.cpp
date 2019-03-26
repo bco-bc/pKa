@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
   std::ifstream stream;
   util::openInputFile(stream, fileName);
 
-  atom_catalog_ptr_t catalog = Factory::atomCatalog();
+  atom_catalog_ptr_t catalog = factory::atomCatalog();
 
   prot_struct_ptr_t protein = ProteinStructure::make(stream, catalog);
 

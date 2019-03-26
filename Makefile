@@ -47,7 +47,7 @@ TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test
         test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp \
         test-lu.cpp test-coulomb.cpp
 
-APPS = s-tri-surface.cpp s-chem2splc.cpp
+APPS = s-tri-surface.cpp s-chem2splc.cpp s-create-atom-group-catalog.cpp
 
 SOBJ = $(SRC:.cpp=.o)
 LOBJ = $(SRC:.cpp=.lo)

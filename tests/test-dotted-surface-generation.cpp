@@ -20,7 +20,7 @@ int main()
   real_t c = 1.0/std::sqrt(el);
   std::clog << "Value of c: " << c << std::endl;
 
-  atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
+  atom_catalog_ptr_t atomCatalog = factory::atomCatalog();
   atom_spec_ptr_t spec = atomCatalog->lookup("N");
   std::vector<atom_ptr_t> atoms;
   

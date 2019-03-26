@@ -56,6 +56,11 @@ namespace simploce {
   using charge_t = real_t;
 
   /**
+   * Mass.
+   */
+  using mass_t = real_t;
+
+  /**
    * Type for (relative) permittivity.
    */
   using permittivity_t = real_t;

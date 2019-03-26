@@ -18,9 +18,11 @@ namespace simploce {
     /**
      * Reads a topology from an input stream.
      * @param stream - Input stream.
-     * @return Catalog.
+     * @param atomCatalog - Atom specification catalog.
+     * @return Atom group specification catalog.
      */
-    static atom_group_catalog_ptr_t valueOf(std::istream& stream);
+    static atom_group_catalog_ptr_t valueOf(std::istream& stream,
+					    const atom_catalog_ptr_t& atomCatalog);
     
   };
 }

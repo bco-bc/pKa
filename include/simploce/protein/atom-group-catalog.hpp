@@ -4,6 +4,8 @@
 #include "../types.hpp"
 #include <string>
 #include <vector>
+#include <fstream>
+#include <iostream>
 
 namespace simploce {
 
@@ -36,7 +38,28 @@ namespace simploce {
      */
     void add(const atom_group_spec_ptr_t& spec, std::size_t occupancy);
 
+    /**
+     * Returns an empty atom group catalog.
+     */
+    static atom_group_catalog_ptr_t make();
+
   };
+
+  /**
+   * Write catalog to output stream.
+   * @param stream - Output stream.
+   * @param catalog - Atom group specifications catalog.
+   * @return Output stream.
+   */
+  std::ostream& operator << (std::ostream& stream, const AtomGroupCatalog& catalog);
+
+  /**
+   * Reads catalog from input stream.
+   * @param stream - Input stream.
+   * @param catalog - Atom group specifications catalog.
+   * @return Input stream.
+   */
+  std::istream& operator >> (std::istream& stream, AtomGroupCatalog& catalog);
 }
 
 #endif

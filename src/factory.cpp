@@ -33,7 +33,8 @@ namespace simploce {
       if ( !atomGroupCatalog_) {
 	std::ifstream stream;
 	util::openInputFile(stream, fileName);
-	atomGroupCatalog_ = GMXAtomGroupCatalog::valueOf(stream);
+	atom_catalog_ptr_t atomCatalog = factory::atomCatalog();
+	atomGroupCatalog_ = GMXAtomGroupCatalog::valueOf(stream, atomCatalog);
 	stream.close();
       }
       return atomGroupCatalog_;

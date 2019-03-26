@@ -89,8 +89,8 @@ namespace simploce {
     void changeProtonationState(const atom_group_catalog_ptr_t& catalog);
 
     /**
-     * Returns protonantion state.
-     * @return Usually, 0 or 1, but 2 (e.g. HIS) or larger is possible as well.
+     * Returns protonation state (proton occupancy).
+     * @return Usually, 0 or 1, but 2 or larger is possible as well.
      */
     std::size_t protonationState() const;
 
@@ -100,12 +100,12 @@ namespace simploce {
     charge_t charge() const;
 
     /**
-     * Translate this group.
+     * Translate this group, RIGID body motion.
      */
     void translate();
 
     /**
-     * Rotate this group.
+     * Rotate this group, RIGID body motion.
      */
     void rotate();
 

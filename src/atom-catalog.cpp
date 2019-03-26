@@ -22,33 +22,39 @@ namespace simploce {
   static void setup_(std::map<std::string, atom_spec_ptr_t>& specs)
   {
     std::string H = "H";
-    atom_spec_ptr_t specH = AtomSpec::make(H, R_H, zero);
+    mass_t mass = 1.008;
+    atom_spec_ptr_t specH = AtomSpec::make(H, R_H, zero, mass);
     pair p = std::make_pair(H, specH);
     specs.insert(p);
 
     std::string C = "C";
-    atom_spec_ptr_t specC = AtomSpec::make(C, R_C, zero);
+    mass = 12.0096;
+    atom_spec_ptr_t specC = AtomSpec::make(C, R_C, zero, mass);
     p = std::make_pair(C, specC);
     specs.insert(p);
 
     std::string O = "O";
-    atom_spec_ptr_t specO = AtomSpec::make(O, R_O, zero);
+    mass = 15.99903;
+    atom_spec_ptr_t specO = AtomSpec::make(O, R_O, zero, mass);
     p = std::make_pair(O, specO);
     specs.insert(p);
 
     std::string N = "N";
-    atom_spec_ptr_t specN = AtomSpec::make(N, R_N, zero);
+    mass = 14.00643;
+    atom_spec_ptr_t specN = AtomSpec::make(N, R_N, zero, mass);
     p = std::make_pair(N, specN);
     specs.insert(p);
     
     std::string S = "S";
-    atom_spec_ptr_t specS = AtomSpec::make(S, R_S, zero);
+    mass = 32.059;
+    atom_spec_ptr_t specS = AtomSpec::make(S, R_S, zero, mass);
     p = std::make_pair(S, specS);
     specs.insert(p);
 
     // Test charge.
     std::string T = "T";
-    atom_spec_ptr_t specT = AtomSpec::make(H, R_T, one);
+    mass = 1;
+    atom_spec_ptr_t specT = AtomSpec::make(H, R_T, one, mass);
     p = std::make_pair(T, specT);
     specs.insert(p);
   }

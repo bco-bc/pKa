@@ -97,6 +97,9 @@ namespace simploce {
     for (auto atom : atoms_) {
       std::string name = atom->name();
       atom_spec_ptr_t aspec = gspec->lookup(name);
+      
+      assert(aspec != nullptr);
+      
       atom->changeSpec_(aspec);
     }
   }

@@ -13,7 +13,7 @@ namespace simploce {
     atom_catalog_ptr_t atomCatalog();
 
     /**
-     * Returns the atom group specification catalog from file.
+     * Reads an atom group specification catalog from file.
      * @param fileName - File name
      */
     atom_group_catalog_ptr_t atomGroupCatalog(const std::string& fileName);

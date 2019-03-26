@@ -1,5 +1,6 @@
 #include "simploce/protein/atom-group-catalog.hpp"
 #include "simploce/protein/atom-group-spec.hpp"
+#include "simploce/conf.hpp"
 #include <boost/lexical_cast.hpp>
 #include <memory>
 #include <map>
@@ -29,7 +30,7 @@ namespace simploce {
    */
   static container_t container_{};
 
-  static key_t makeKey(std::size_t occupancy, const std::string& name)
+  static key_t makeKey_(std::size_t occupancy, const std::string& name)
   {
     return std::make_pair(occupancy, name);
   }
@@ -67,9 +68,34 @@ namespace simploce {
   void AtomGroupCatalog::add(const atom_group_spec_ptr_t& spec, std::size_t occupancy)
   {
     std::string name = spec->name();
-    key_t key = std::make_pair(occupance, name);
-    std::pair value = std::make_pair(key, spec);
-    container_.insert(pair);
+    key_t key = makeKey_(occupancy, name);
+    auto value = std::make_pair(key, spec);
+    container_.insert(value);
+  }
+
+  atom_group_catalog_ptr_t AtomGroupCatalog::make()
+  {
+    return std::make_shared<AtomGroupCatalog>();
+  }
+
+  std::ostream& operator << (std::ostream& stream, const AtomGroupCatalog& catalog)
+  {
+    std::size_t size = container_.size();
+    std::size_t counter{0};
+    for (iter_t iter = container_.begin(); iter != container_.end(); ++iter) {
+      atom_group_spec_ptr_t spec = iter->second;
+      stream << *spec;
+      if ( counter < size - 1) {
+	stream << std::endl;
+      }
+      counter += 1;
+    }
+    return stream;
+  }
+
+  std::istream& operator >> (std::istream& stream, AtomGroupCatalog& catalog)
+  {
+    return stream;
   }
 
 }

@@ -8,7 +8,7 @@ using namespace simploce;
 
 int main(int argc, char *argv[])
 {
-  atom_catalog_ptr_t atomCatalog = Factory::atomCatalog();
+  atom_catalog_ptr_t atomCatalog = factory::atomCatalog();
   atom_spec_ptr_t spec = atomCatalog->lookup("T");
   
   permittivity_t epsI{4.0};
