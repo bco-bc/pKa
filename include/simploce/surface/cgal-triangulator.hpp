@@ -1,5 +1,5 @@
-#ifndef TETRAHEDRON_TRIANGULATOR_HPP
-#define TETRAHEDRON_TRIANGULATOR_HPP
+#ifndef CGAL_TRIANGULATOR_HPP
+#define CGAL_TRIANGULATOR_HPP
 
 #include "triangulator.hpp"
 
@@ -18,8 +18,9 @@ namespace simploce {
 
     /**
      * Returns triangulator.
+     * @param Requested number of triangles. Ignored.
      */
-    static triangulator_ptr_t make();
+    static triangulator_ptr_t make(std::size_t ntriangles);
     
   };
 }

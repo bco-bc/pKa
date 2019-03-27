@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
   std::clog << "Title: " << protein->title() << std::endl;
   std::clog << "Number of atoms: " << protein->numberOfAtoms() << std::endl;
   std::clog << "Number of atom groups: " << protein->numberOfAtomGroups() << std::endl;
+  std::clog << std::endl;
 
   // Write protein structure to output file.
   if ( format != splc ) {
@@ -158,12 +159,14 @@ int main(int argc, char *argv[])
     ostream.close();
     std::clog << "Protein strcuture written to output file '"
 	      << fnOutputProtein << "'." << std::endl;
+    std::clog << std::endl;
   }
 
   // Generate dotted surface.
   Surface surface = protein->dottedSurface();
   std::clog << "Surface area (nm^2): " << surface.area() << std::endl;
   std::clog << "Volume (nm^3): " << surface.volume() << std::endl;
+  std::clog << std::endl;
 
   // Write surface to output file.
   util::openOutputFile(ostream, fnOutputDottedSurface);
@@ -171,6 +174,7 @@ int main(int argc, char *argv[])
   ostream.close();
   std::clog << "Dotted surface written to output file '"
 	    << fnOutputDottedSurface << "'." << std::endl;
+  std::clog << std::endl;
 
   // Triangulate.
   triangulator_ptr_t triangulator = factory::triangulator(ntriangles);

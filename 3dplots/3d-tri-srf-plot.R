@@ -22,7 +22,7 @@ for (j in 1:nsp) {
 
 # Draw dotted surface.
 open3d()
-plot3d(x, y, z, type = "p", col = "steelblue")
+#plot3d(x, y, z, type = "p", col = "steelblue")
 
 # Read triangulated surface
 data<-scan(file="/home/ajuffer/PT-CGMD/work/triangulated.srf")

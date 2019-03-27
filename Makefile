@@ -24,7 +24,7 @@ TEMPLATES = lu.hpp mu-units.hpp si-units.hpp util.hpp
 
 INCLUDE = conf.hpp types.hpp \
           factory.hpp surface.hpp triangulated-surface.hpp triangle.hpp edge.hpp vertex.hpp \
-          triangulator.hpp sphere-triangulator.hpp \
+          triangulator.hpp sphere-triangulator.hpp cgal-triangulator.hpp \
           tetrahedron-triangulator.hpp nsc.hpp dotted-surface-generator.hpp \
           chem-reader.hpp pdb-reader.hpp input-source.hpp content-handler.hpp \
           base-content-handler.hpp gmx-reader.hpp \
@@ -35,7 +35,7 @@ INCLUDE = conf.hpp types.hpp \
           flat-triangles-bem.hpp coulomb.hpp 
 
 SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp vertex.cpp \
-      tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp \
+      tetrahedron-triangulator.cpp nsc.cpp dotted-surface-generator.cpp cgal-triangulator.cpp \
       pdb-reader.cpp file-input-source.cpp logger-content-handler.cpp gmx-reader.cpp \
       atom-spec.cpp atom.cpp atom-catalog.cpp protein-structure.cpp \
       protein-structure-content-handler.cpp sphere-triangulator.cpp \
@@ -45,7 +45,7 @@ SRC = factory.cpp surface.cpp triangulated-surface.cpp triangle.cpp edge.cpp ver
 
 TESTS = test-vertex.cpp test-surface.cpp test-dotted-surface-generation.cpp test-pdb-reader.cpp \
         test-kernels.cpp test-read-protein-structure.cpp test-charge-inside-sphere.cpp \
-        test-lu.cpp test-coulomb.cpp
+        test-lu.cpp test-coulomb.cpp test-cgal-triangulator.cpp
 
 APPS = s-tri-surface.cpp s-chem2splc.cpp s-create-atom-group-catalog.cpp
 
@@ -70,7 +70,7 @@ CFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -pthread $(CFLAGS_EIG
 LDFLAGS_EIGEN = -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed
 LDFLAGS = -I../include $(INCLPATH) $(OPT) -Wall -std=$(STD) -L. -L$(PREFIX)/lib -pthread $(LDFLAGS_EIGEN)
 LIBS_EIGEN = -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -ldl -lblas -llapack
-LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz $(LIBS_EIGEN)
+LIBS = -lm -l$(LNAME) -lpthread $(OLIBS) -lboost_program_options -lboost_iostreams -lbz2 -lz -lCGAL -lCGAL_Core $(LIBS_EIGEN)
 #-lz for zlib
 
 # All object files. Default.

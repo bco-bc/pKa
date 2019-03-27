@@ -2,6 +2,7 @@
 #include "simploce/protein/atom-catalog.hpp"
 #include "simploce/protein/gmx-atom-group-catalog.hpp"
 #include "simploce/surface/sphere-triangulator.hpp"
+#include "simploce/surface/cgal-triangulator.hpp"
 #include "simploce/util/util.hpp"
 #include <fstream>
 
@@ -23,7 +24,7 @@ namespace simploce {
     triangulator_ptr_t triangulator(std::size_t ntriangles)
     {
       if ( !triangulator_ ) {
-	triangulator_ = SphereTriangulator::make(ntriangles);
+	triangulator_ = CgalTriangulator::make(ntriangles);
       }
       return triangulator_;
     }

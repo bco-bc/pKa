@@ -7,7 +7,7 @@
 namespace simploce {
 
   /**
-   * Reles on NSC.
+   * Relies on NSC.
    * See nsc.hpp for references.
    */
   Surface generateDottedSurface(const std::vector<atom_ptr_t>& atoms, std::size_t nod)
