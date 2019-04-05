@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project ( cgal-triangulator )
 
-set(Boost_USE_MULTITHREADED ON)
+set( Boost_USE_MULTITHREADED ON )
 
-find_package( CGAL QUIET COMPONENTS  )
+find_package( CGAL QUIET COMPONENTS )
 
 if ( NOT CGAL_FOUND )
 
@@ -16,6 +16,7 @@ endif()
 
 include( ${CGAL_USE_FILE} )
 
+set ( Eigen3_DIR /localdisk/local/share/eigen3/cmake )
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 set (CMAKE_CXX_FLAGS "-Wall -O2 -pg -std=c++14 -lfftw3")

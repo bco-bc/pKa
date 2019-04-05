@@ -6,128 +6,252 @@
 #include <stdexcept>
 #include <iostream>
 #include <map>
+#include <utility> 
+#include <list>
+#include <fstream>
 
 // Cgal Includes
+#include <CGAL/config.h>
+#include <CGAL/Timer.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Delaunay_triangulation_3.h>
-#include <CGAL/Alpha_shape_3.h>
-#include <CGAL/Triangulation_hierarchy_3.h>
-#include <CGAL/Triangulation_vertex_base_with_info_3.h>
 
-// Cgal typedefs 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef K::Point_3 Point_3;
+// Point Processing 
+#include <CGAL/jet_estimate_normals.h>
+#include <CGAL/pca_estimate_normals.h>
+#include <CGAL/vcm_estimate_normals.h>
+#include <CGAL/jet_smooth_point_set.h>
+#include <CGAL/mst_orient_normals.h>
 
-typedef CGAL::Alpha_shape_vertex_base_3<K>                   Vb;
-typedef CGAL::Triangulation_hierarchy_vertex_base_3<Vb>      Vbh; 
-typedef CGAL::Alpha_shape_cell_base_3<K>                     Fb;
-typedef CGAL::Triangulation_data_structure_3<Vbh,Fb>         Tds;
+// Surface reconstruction
+#include <CGAL/property_map.h>
+#include <CGAL/Polyhedron_3.h>
+#include <CGAL/poisson_surface_reconstruction.h>
 
-typedef CGAL::Delaunay_triangulation_3<K, Tds, CGAL::Fast_location> Delaunay;
-    
-typedef CGAL::Alpha_shape_3<Delaunay> Alpha_shape_3;
+#include <CGAL/Scale_space_surface_reconstruction_3.h>
+#include <CGAL/Scale_space_reconstruction_3/Advancing_front_mesher.h>
+#include <CGAL/Scale_space_reconstruction_3/Jet_smoother.h>
 
+
+// Concurrency
+#ifdef CGAL_LINKED_WITH_TBB
+typedef CGAL::Parallel_tag Concurrency_tag;
+#else
+typedef CGAL::Sequential_tag Concurrency_tag;
+#endif
+ 
+typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
+typedef Kernel::Point_3 Point;
+typedef Kernel::Vector_3 Vector;
+typedef std::pair<Point, Vector> PointVectorPair;
+typedef CGAL::Timer Timer;
+
+typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
+typedef CGAL::Scale_space_surface_reconstruction_3<Kernel> Reconstruction;
+
+typedef CGAL::Scale_space_reconstruction_3::Jet_smoother<Kernel>           JetSmoother;
+typedef CGAL::Scale_space_reconstruction_3::Weighted_PCA_smoother<Kernel>  PCASmoother;
+typedef CGAL::Scale_space_reconstruction_3::Advancing_front_mesher<Kernel> AdvancingFrontMesher;
+typedef CGAL::Scale_space_reconstruction_3::Alpha_shape_mesher<Kernel>     AlphaShapeMesher;
 
 
 namespace simploce {
+    
+    static void scale_space_surface_reconstruction (std::vector<Point>& points,
+						    int nb_neighbors=24,
+						    float size_facets=0.5,
+						    float scale=4.0)
+    {
+	std::clog << "Scale Space Method." << std::endl;
+	CGAL::Timer t;
+	t.start();
+	
+	std::clog << "Reconstruction >> ";
+	// Construct the mesh in a scale space.
+	Reconstruction reconstruct (points.begin(), points.end());
+	
+        //PCASmoother Psmoother(8, 300);
+	// reconstruct.increase_scale(2, Psmoother);
+	// reconstruct.reconstruct_surface(asmesher);
 
+	reconstruct.increase_scale(scale, JetSmoother(nb_neighbors));    
+	reconstruct.reconstruct_surface(AdvancingFrontMesher(size_facets));
+	std::clog << "DONE in " << t.time() << "s." << std::endl;
+	t.reset();
+
+	std::clog << "Writting >> ";
+	std::ostringstream oss;
+	oss << "scale" << nb_neighbors << "_" << size_facets << " " << scale << ".off";
+	std::ofstream out (oss.str());
+	out << reconstruct;
+	// dump_reconstruction(reconstruct, "scale.off")
+	std::clog << "DONE in " << t.time() << "s." << std::endl;
+	t.reset();
+	
+    }
+    
+    static void poisson_surface_reconstruction (std::vector<Point>& points,
+						int normal_neighbors=18,
+						int spacing_neighbors=6,
+						float scaling=1.0)
+    {
+
+        // Smoothing of the points set
+	std::clog << "Poisson Method." << std::endl;
+	CGAL::Timer t;
+	t.start();
+	
+	// std::clog << "Smoothing Point cloud >> ";
+	// CGAL::jet_smooth_point_set<Concurrency_tag>(points, 6);
+	// std::clog << "DONE in " << t.time() << "s." << std::endl;
+	// t.reset();
+	
+        std::list<PointVectorPair> pointsNormal;
+	for (auto p : points)
+	{
+	    PointVectorPair pn;
+	    pn.first = p;
+	    pn.second = Vector();
+	    pointsNormal.push_back(pn);
+	}
+	t.reset();
+	
+	// Estimates normals direction.
+	// Note: pca_estimate_normals() requiresa range of points
+	// as well as property maps to access each point's position and normal.
+	std::clog << "Compute Normals >> "; 
+	// const int normal_neighbors = 18; // K-nearest neighbors = 3 rings
+	CGAL::jet_estimate_normals<Concurrency_tag>
+	    (pointsNormal, normal_neighbors,
+	     CGAL::parameters::point_map(CGAL::First_of_pair_property_map<PointVectorPair>()).
+	     normal_map(CGAL::Second_of_pair_property_map<PointVectorPair>()));
+        std::clog << "DONE in " << t.time() << "s." << std::endl;
+	t.reset();
+	 
+	// Orients normals.
+	// Note: mst_orient_normals() requires a range of points
+	// as well as property maps to access each point's position and normal.
+	std::clog << "Orient Normals >> ";
+	std::list<PointVectorPair>::iterator unoriented_points_begin =
+	    CGAL::mst_orient_normals(pointsNormal, normal_neighbors,
+				     CGAL::parameters::point_map(
+					 CGAL::First_of_pair_property_map<PointVectorPair>()).
+				     normal_map(
+					 CGAL::Second_of_pair_property_map<PointVectorPair>()));
+        std::clog << "DONE in " << t.time() << "s." << std::endl;
+	
+	// Optional: delete points with an unoriented normal
+	// if you plan to call a reconstruction algorithm that expects oriented normals.
+	pointsNormal.erase(unoriented_points_begin, pointsNormal.end());
+	t.reset();
+	
+	Polyhedron output_mesh;
+	std::clog << "Compute Average Spacing >> "; 
+	double average_spacing = CGAL::compute_average_spacing<Concurrency_tag>
+	    (pointsNormal, spacing_neighbors,
+	     CGAL::parameters::point_map(CGAL::First_of_pair_property_map<PointVectorPair>()));
+        std::clog << "DONE in " << t.time() << "s." << std::endl;
+	t.reset();
+	
+	std::clog << "Reconstruction >> ";
+	CGAL::poisson_surface_reconstruction_delaunay
+	    (pointsNormal.begin(), pointsNormal.end(),
+	     CGAL::First_of_pair_property_map<PointVectorPair>(),
+	     CGAL::Second_of_pair_property_map<PointVectorPair>(),
+	     output_mesh, scaling*average_spacing);
+        std::clog << "DONE in " << t.time() << "s." << std::endl;
+	t.reset();
+	
+	std::clog << "Writting >> ";
+        std::ostringstream oss;
+	oss << "poisson_" << normal_neighbors << "_"
+	    << spacing_neighbors << "_" << scaling << ".off";
+	std::ofstream out (oss.str());
+	out << output_mesh;
+        std::clog << "DONE in " << t.time() << "s." << std::endl;
+	t.reset();
+    }
+
+    void advancing_front_sruface_reconstruction (std::vector<Point>& points)
+    {
+
+	
+	
+    }
+    
     TriangulatedSurface
     CgalTriangulator::generate(const std::vector<position_t>& points,
 			       bool spherical,
 			       const radius_t& radius) const
     {
 	std::clog << "WARNING: value of 'spherical' is ignored." << std::endl;
-	std::clog << "WARNING: value of 'radius' is used as alpha value." << std::endl;
-
-        // Convert position_t to Point_3
-	std::vector<Point_3> cgalPoints;
+	std::clog << "WARNING: value of 'radius' is ignored." << std::endl;
+	std::clog << "Using CGAL Version " <<  CGAL_VERSION_NR << " (1MMmmb1000)." << std::endl;
+	
+        // Convert position_t to Point
+	std::vector<Point> cgalPoints;
 	for (auto p : points)
 	{
-	    Point_3 cp(p.x(), p.y(), p.z());
+	    Point cp(p.x(), p.y(), p.z());
 	    cgalPoints.push_back(cp);
 	}
+	poisson_surface_reconstruction(cgalPoints, 24, 24, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 24, 18, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 24, 12, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 24, 6, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 18, 24, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 18, 18, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 18, 12, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 18, 6, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 12, 24, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 12, 18, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 12, 12, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 12, 6, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 6, 24, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 6, 18, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 6, 12, 0.5);
+	poisson_surface_reconstruction(cgalPoints, 6, 6, 0.5);
 	
-	// Insert points into Alpha Shape.
-	Alpha_shape_3 surface(cgalPoints.begin(), cgalPoints.end(), Alpha_shape_3::REGULARIZED);
+	poisson_surface_reconstruction(cgalPoints, 24, 24, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 24, 18, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 24, 12, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 24, 6, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 18, 24, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 18, 18, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 18, 12, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 18, 6, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 12, 24, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 12, 18, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 12, 12, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 12, 6, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 6, 24, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 6, 18, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 6, 12, 0.3);
+	poisson_surface_reconstruction(cgalPoints, 6, 6, 0.3);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.1, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.2, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.3, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.4, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.5, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.0, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.5, 5.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 2.0, 5.0);
+        // scale_space_surface_reconstruction(cgalPoints,24, 0.5, 4.0);
+        // scale_space_surface_reconstruction(cgalPoints,24, 1.0, 4.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.5, 4.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 2.0, 4.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.5, 2.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.0, 2.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.5, 2.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 2.0, 2.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 0.5, 1.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.0, 1.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 1.5, 1.0);
+	// scale_space_surface_reconstruction(cgalPoints,24, 2.0, 1.0);
 	
-	// Identinfy alpha values corresponding to solid components
-	Alpha_shape_3::NT alpha_solid = surface.find_alpha_solid();
-	
-	// Get the optimal alpha value to get one single solid component
-	Alpha_shape_3::Alpha_iterator opt = surface.find_optimal_alpha(1);
-
-	// Set the alpha value to the optimal.
-	// After that point the surface return is the final alpha shape
-	surface.set_alpha(*opt);
-	std::clog << "CGAL: Using optimal alpha value "
-		  << *opt << " to get one connected component."<< std::endl;
-	assert(as.number_of_solid_components() == 1);
-
-	std::vector<Alpha_shape_3::Vertex_handle> cgalVertices;
-	std::vector<Alpha_shape_3::Edge> cgalEdges;
-	std::vector<Alpha_shape_3::Facet> facets;
-
-	// Only REGULAR element are keep. E.g. an edge is regular if it is shared by only
-	// two faces. This way, we end up with only edge that are ont the surface of the
-	// alpha shape.
-        surface.get_alpha_shape_vertices(std::back_inserter(cgalVertices),
-					 Alpha_shape_3::REGULAR);
-	surface.get_alpha_shape_edges(std::back_inserter(cgalEdges),
-				      Alpha_shape_3::REGULAR);
-	surface.get_alpha_shape_facets(std::back_inserter(facets),
-				       Alpha_shape_3::REGULAR);
-
-	std::vector<vertex_ptr_t> vertices;
-	std::map<Point_3, vertex_ptr_t> verticesMap;
-	for (auto v_it : cgalVertices)
-	{
-	    Point_3 temp = v_it->point();
-	    position_t point(temp.x(), temp.y(), temp.z());
-	    vertex_ptr_t v = std::make_shared<vertex_t>(point);
-	    verticesMap[v_it->point()] = v;
-	    vertices.push_back(v);
-	}
-
+ 	std::vector<vertex_ptr_t> vertices;
 	std::vector<Edge> edges;
-	for (auto e_it : cgalEdges)
-	{
-	    auto tmp_tetra = e_it.get<0>();
-	    int p1, p2;
-	    p1 = e_it.get<1>();
-	    p2 = e_it.get<2>();
-	    Edge edge{verticesMap.find(tmp_tetra->vertex(p1)->point())->second,
-	    	    verticesMap.find(tmp_tetra->vertex(p2)->point())->second};
-	    edges.push_back(edge);
-	}
-
 	std::vector<Triangle> triangles;
-	for (auto tri_it : facets)
-	{
-	    // Check orientation of the facet
-	    if (surface.classify(tri_it.first) != Alpha_shape_3::EXTERIOR)
-	    {
-	        tri_it = surface.mirror_facet(tri_it);
-	    }
 
-	    // Cycle throught the tetrahderon's vertices to get the facet
-	    std::vector<vertex_ptr_t> temp;
-	    auto tmp_tetra = tri_it.first;	    
-	    for (int i = 0; i < 4; i++) {
-		if (i != tri_it.second) {
-		    temp.push_back(verticesMap.find(tmp_tetra->vertex(i)->point())->second);
-		}
-	    }
-
-	    // Swap vertex to keep consistensy with orientation
-	    if (tri_it.second%2 == 0)
-	    {
-		std::swap(temp.at(0), temp.at(1));
-	    }
-	    
-	    Triangle triangle{temp.at(0), temp.at(1), temp.at(2)};
-	    triangles.push_back(triangle);
-	}
-	
 	return TriangulatedSurface{vertices, triangles, edges};    
     }
     
